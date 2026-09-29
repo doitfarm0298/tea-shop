@@ -1,0 +1,7 @@
+{
+  "name": "uji-tea-shop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "自然栽培の宇治茶オンラインショップ(フロントエンド + Square決済用サーバーレス関数)",
+  "dependencies": {}
+}

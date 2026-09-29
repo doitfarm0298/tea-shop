@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOIT!FARM! ― 自然栽培の宇治茶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A4A;
+    --ink-soft:#E8F0C9;
+    --paper:#D6E4A0;
+    --paper-dim:#C5D688;
+    --moss:#2B3F6B;
+    --moss-deep:#1B2A4A;
+    --clay:#B0262A;
+    --gold:#7A1B1E;
+    --text-light:#F5F1E4;
+    --text-muted:#D9D2C4;
+    --muted-dark:#4E5A72;
+    --line: rgba(27,42,74,0.16);
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Shippori Mincho', serif;
+    font-weight:600;
+    letter-spacing:.02em;
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:40;
+    display:grid; grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    padding:22px 28px;
+    background:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+  }
+  header .brand{grid-column:2; justify-self:center;}
+  header #cart-btn{grid-column:3; justify-self:end;}
+  .brand{
+    display:flex; align-items:center; gap:14px;
+    font-family:'Shippori Mincho', serif;
+    font-size:1.5rem;
+    font-weight:600;
+    letter-spacing:.08em;
+  }
+  .brand img{
+    width:56px; height:56px;
+    display:block;
+  }
+  .brand small{
+    display:block;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:.95rem;
+    letter-spacing:.18em;
+    color:var(--muted-dark);
+    margin-top:2px;
+    font-weight:400;
+  }
+  #cart-btn{
+    position:relative;
+    background:none; border:1px solid var(--line);
+    color:var(--ink);
+    width:42px; height:42px; border-radius:50%;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .2s;
+  }
+  #cart-btn:hover{border-color:var(--gold);}
+  #cart-count{
+    position:absolute; top:-6px; right:-6px;
+    background:var(--clay); color:var(--text-light);
+    font-size:.68rem; min-width:18px; height:18px;
+    border-radius:9px; display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+  }
+  #cart-count.hidden{display:none;}
+
+  .activity-bar{
+    background:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    padding:9px 28px;
+    font-size:.72rem;
+    letter-spacing:.3em;
+    color:var(--muted-dark);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:78vh;
+    display:flex;
+    align-items:flex-end;
+    padding:0;
+    overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    z-index:0;
+    opacity:0;
+    animation:heroFade 65s infinite;
+  }
+  .hero-bg:nth-of-type(1){animation-delay:0s;}
+  .hero-bg:nth-of-type(2){animation-delay:6.5s;}
+  .hero-bg:nth-of-type(3){animation-delay:13s;}
+  .hero-bg:nth-of-type(4){animation-delay:19.5s;}
+  .hero-bg:nth-of-type(5){animation-delay:26s;}
+  .hero-bg:nth-of-type(6){animation-delay:32.5s;}
+  .hero-bg:nth-of-type(7){animation-delay:39s;}
+  .hero-bg:nth-of-type(8){animation-delay:45.5s;}
+  .hero-bg:nth-of-type(9){animation-delay:52s;}
+  .hero-bg:nth-of-type(10){animation-delay:58.5s;}
+  @keyframes heroFade{
+    0%{opacity:0;}
+    1%{opacity:1;}
+    9%{opacity:1;}
+    10%{opacity:0;}
+    100%{opacity:0;}
+  }
+  .hero-logo{
+    position:absolute;
+    top:36px; left:36px;
+    width:200px; height:200px;
+    opacity:0.22;
+    z-index:1;
+    pointer-events:none;
+  }
+  .hero-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(27,42,30,0.15) 0%, rgba(27,42,30,0.55) 60%, rgba(27,42,30,0.92) 100%);
+    z-index:1;
+  }
+  .hero-content{
+    position:relative; z-index:2;
+    max-width:1180px; margin:0 auto;
+    width:100%;
+    padding:64px 28px 56px;
+    color:var(--text-light);
+  }
+  .hero-content h1{
+    font-size:clamp(2.1rem, 4.2vw, 3.3rem);
+    line-height:1.35;
+    margin:0 0 22px;
+    max-width:16ch;
+  }
+  .hero-content p{
+    max-width:48ch;
+    color:var(--text-muted);
+    font-size:1rem;
+    margin:0 0 26px;
+  }
+  .hero-tags{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin-bottom:30px;
+  }
+  .hero-tags span{
+    border:1px solid var(--line);
+    background:rgba(27,42,30,0.4);
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:.78rem;
+    color:var(--text-muted);
+  }
+  .cta{
+    display:inline-block;
+    background:rgba(245,241,228,0.28);
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+    color:var(--text-light);
+    padding:13px 32px;
+    border-radius:2px;
+    border:1.5px solid rgba(245,241,228,0.8);
+    text-decoration:none;
+    font-size:.92rem;
+    font-weight:700;
+    letter-spacing:.05em;
+    cursor:pointer;
+    transition:background .2s, color .2s;
+  }
+  .cta:hover{background:rgba(245,241,228,0.45);}
+
+
+  /* ---------- story strip ---------- */
+  .story{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:var(--ink-soft);
+  }
+  .story-inner{
+    max-width:1180px; margin:0 auto;
+    padding:46px 28px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:36px;
+  }
+  .story-inner div h3{
+    font-size:1.02rem; margin:0 0 10px; color:var(--gold);
+  }
+  .story-inner div p{
+    margin:0; font-size:.88rem; color:var(--text-muted);
+  }
+
+  /* ---------- about producer ---------- */
+  .about-section{
+    background:var(--ink-soft);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .about-inner{
+    max-width:760px; margin:0 auto;
+    padding:70px 28px;
+  }
+  .about-header{
+    display:flex; align-items:center; gap:16px;
+    margin-bottom:28px;
+  }
+  .about-header img{
+    width:64px; height:64px; border-radius:50%;
+    object-fit:cover; flex-shrink:0;
+  }
+  .about-header h2{font-size:1.6rem; margin:0;}
+  .about-text p{
+    color:var(--muted-dark); font-size:.95rem;
+    line-height:1.9;
+    margin:0 0 18px; max-width:68ch;
+  }
+  .activity-list{
+    display:flex; flex-wrap:wrap; gap:10px;
+    margin-top:22px;
+  }
+  .activity-list span{
+    border:1px solid var(--ink);
+    color:var(--ink);
+    font-size:.8rem;
+    padding:6px 16px;
+    border-radius:20px;
+  }
+
+  /* ---------- products ---------- */
+  .section-head{
+    max-width:1180px; margin:0 auto;
+    padding:76px 28px 30px;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:20px; flex-wrap:wrap;
+  }
+  .section-head h2{font-size:1.9rem; margin:0;}
+  .section-head p{margin:0; color:var(--muted-dark); font-size:.9rem; max-width:38ch;}
+
+  .products-wrap{
+    max-width:1180px; margin:0 auto;
+    padding:0 28px 90px;
+  }
+  .category-block{margin-bottom:56px;}
+  .category-block:last-child{margin-bottom:0;}
+  .category-heading{
+    font-size:1.3rem;
+    margin:0 0 22px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .category-note{
+    font-size:.82rem;
+    color:var(--muted-dark);
+    margin:-10px 0 22px;
+  }
+  .products{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
+    gap:26px;
+  }
+  .card{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .card-art{
+    position:relative;
+    aspect-ratio:4/3;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper-dim);
+  }
+  .card-art svg{width:56%;height:56%;}
+  .card.sold-out .card-art svg{opacity:.35;}
+  .card.sold-out h3, .card.sold-out .desc, .card.sold-out .price{opacity:.5;}
+  .sold-out-badge{
+    position:absolute; top:12px; left:12px;
+    background:var(--ink); color:var(--text-light);
+    font-size:.7rem; letter-spacing:.05em;
+    padding:4px 12px; border-radius:20px;
+  }
+  .add-btn:disabled{
+    background:var(--paper-dim); color:var(--muted-dark);
+    cursor:not-allowed;
+  }
+  .add-btn:disabled:hover{background:var(--paper-dim);}
+  .card-body{padding:20px 20px 22px; display:flex; flex-direction:column; flex:1;}
+  .product-label{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+    font-size:.78rem;
+  }
+  .product-label summary{
+    cursor:pointer;
+    color:var(--muted-dark);
+    list-style:none;
+  }
+  .product-label summary::-webkit-details-marker{display:none;}
+  .product-label summary::before{content:'▸ '; }
+  .product-label[open] summary::before{content:'▾ ';}
+  .product-label dl{
+    margin:10px 0 0;
+    display:grid;
+    grid-template-columns:5.5em 1fr;
+    row-gap:6px; column-gap:10px;
+  }
+  .product-label dt{color:var(--muted-dark); font-weight:700;}
+  .product-label dd{margin:0;}
+  .card-body .kind{font-size:.72rem; color:var(--moss-deep); letter-spacing:.05em; margin-bottom:6px;}
+  .card-body h3{font-size:1.12rem; margin:0 0 8px; font-weight:600;}
+  .card-body p.desc{
+    font-size:.84rem; color:var(--muted-dark); margin:0 0 16px; flex:1;
+  }
+  .card-foot{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:auto;
+  }
+  .price{font-family:'Shippori Mincho',serif; font-size:1.05rem;}
+  .price span{font-size:.72rem; color:var(--muted-dark);}
+  .add-btn{
+    background:var(--moss-deep); color:var(--text-light);
+    border:none; padding:9px 16px; border-radius:2px;
+    font-size:.82rem; cursor:pointer;
+    transition:background .2s;
+  }
+  .add-btn:hover{background:var(--moss);}
+  .add-btn.added{background:var(--clay); color:var(--text-light);}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding:50px 28px 34px;
+  }
+  .footer-inner{
+    max-width:1180px; margin:0 auto;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px;
+  }
+  .footer-inner .fb{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Shippori Mincho',serif; font-size:1.05rem; margin-bottom:8px;
+  }
+  .footer-inner .fb img{width:28px;height:28px;}
+  .footer-inner p{color:var(--muted-dark); font-size:.82rem; margin:0;}
+
+  /* ---------- cart drawer ---------- */
+  #overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    opacity:0; pointer-events:none; transition:opacity .25s;
+    z-index:50;
+  }
+  #overlay.open{opacity:1; pointer-events:auto;}
+  #drawer{
+    position:fixed; top:0; right:0; height:100%;
+    width:min(400px, 92vw);
+    background:var(--paper);
+    color:var(--ink);
+    z-index:51;
+    transform:translateX(100%);
+    transition:transform .28s ease;
+    display:flex; flex-direction:column;
+  }
+  #drawer.open{transform:translateX(0);}
+  .drawer-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 22px 16px;
+    border-bottom:1px solid rgba(0,0,0,.08);
+  }
+  .drawer-head h3{margin:0; font-size:1.2rem;}
+  #close-cart{background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--ink);}
+  #cart-items{flex:1; overflow-y:auto; padding:10px 22px;}
+  .cart-row{
+    display:flex; gap:12px; padding:16px 0;
+    border-bottom:1px solid rgba(0,0,0,.07);
+  }
+  .cart-row .ci-art{width:56px;height:56px;background:var(--paper-dim); border-radius:2px; flex-shrink:0; display:flex;align-items:center;justify-content:center;}
+  .cart-row .ci-art svg{width:60%;height:60%;}
+  .cart-row .ci-info{flex:1;}
+  .cart-row .ci-info .name{font-size:.9rem; font-weight:700; margin-bottom:4px;}
+  .qty-row{display:flex; align-items:center; gap:10px; margin-top:6px;}
+  .qty-row button{
+    width:24px;height:24px; border:1px solid rgba(0,0,0,.15); background:none;
+    border-radius:50%; cursor:pointer; font-size:.85rem; line-height:1;
+  }
+  .qty-row .remove{border:none; color:var(--clay); font-size:.76rem; text-decoration:underline; cursor:pointer; margin-left:auto;}
+  .ci-price{font-size:.85rem; white-space:nowrap;}
+  #cart-empty{padding:60px 10px; text-align:center; color:#8a8368; font-size:.9rem;}
+  .drawer-foot{
+    padding:20px 22px 26px;
+    border-top:1px solid rgba(0,0,0,.08);
+  }
+  .subtotal-row{
+    display:flex; justify-content:space-between;
+    font-size:1.02rem; margin-bottom:14px;
+  }
+  .subtotal-row .amt{font-family:'Shippori Mincho',serif;}
+  .total-row{
+    font-weight:700; font-size:1.1rem;
+    padding-top:6px; margin-top:2px;
+    border-top:1px solid rgba(0,0,0,.1);
+  }
+  .checkout-btn{
+    width:100%; background:var(--clay); color:var(--text-light);
+    border:none; padding:14px; border-radius:2px; font-size:.95rem;
+    cursor:pointer; transition:background .2s;
+  }
+  .checkout-btn:hover{background:var(--gold);}
+  .checkout-btn:disabled{opacity:.55; cursor:not-allowed;}
+
+  .pay-method-select{
+    display:flex; gap:8px;
+    margin-bottom:16px;
+  }
+  .pay-method-btn{
+    flex:1;
+    background:var(--paper-dim);
+    color:var(--muted-dark);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:9px 10px;
+    font-size:.76rem;
+    cursor:pointer;
+    transition:background .2s, color .2s;
+  }
+  .pay-method-btn.active{
+    background:var(--ink);
+    color:var(--text-light);
+    border-color:var(--ink);
+  }
+  .bank-box{
+    background:var(--paper-dim);
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:14px;
+    font-size:.84rem;
+    line-height:1.7;
+  }
+  .bank-box-title{font-weight:700; margin:0 0 8px;}
+  .bank-order-no{margin-top:10px;}
+  .bank-order-no strong{font-family:'Shippori Mincho',serif; letter-spacing:.05em;}
+  .bank-note{
+    font-size:.76rem; color:var(--muted-dark);
+    margin-top:10px;
+  }
+  .ship-note{font-size:.72rem; color:#8a8368; margin-top:10px; text-align:center;}
+  #checkout-error{
+    display:none; font-size:.78rem; color:var(--clay); margin-bottom:10px; text-align:center;
+  }
+
+  @media (max-width:820px){
+    .hero{min-height:64vh;}
+    .hero-logo{width:120px; height:120px; top:24px; left:24px;}
+    .story-inner{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+    .hero-bg{animation:none !important; opacity:0 !important;}
+    .hero-bg:nth-of-type(1){opacity:1 !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><img src="images/logo.png" alt="DOIT!FARM! ロゴ">DOIT!FARM!<small>自然栽培の宇治茶</small></div>
+  <button id="cart-btn" aria-label="カートを開く">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+    <span id="cart-count" class="hidden">0</span>
+  </button>
+</header>
+
+<div class="activity-bar">栽培　製茶　出店　委託販売　業務用卸し</div>
+
+<section class="hero">
+  <img class="hero-bg" src="images/hero_sunset.jpg" alt="夕暮れの茶畑">
+  <img class="hero-bg" src="images/cover_net_view.jpg" alt="覆いの上を歩く生産者">
+  <img class="hero-bg" src="images/cover_net_two.jpg" alt="二人で覆いをかける様子">
+  <img class="hero-bg" src="images/leaf_sky.jpg" alt="空を背景にした茶葉">
+  <img class="hero-bg" src="images/harvest_machine.jpg" alt="摘採機での収穫">
+  <img class="hero-bg" src="images/carry_sacks.jpg" alt="収穫した茶葉を運ぶ様子">
+  <img class="hero-bg" src="images/truck_load.jpg" alt="軽トラへの積み込み">
+  <img class="hero-bg" src="images/sort_group.jpg" alt="室内で茶葉を選別する様子">
+  <img class="hero-bg" src="images/machine_pour.jpg" alt="揉捻機に茶葉を入れる様子">
+  <img class="hero-bg" src="images/tasting.jpg" alt="試飲会でお茶を注ぐ様子">
+  <img class="hero-logo" src="images/logo-white.png" alt="">
+  <div class="hero-scrim"></div>
+  <div class="hero-content">
+    <h1>大きな自然の中の小さな茶畑で。</h1>
+    <p>京都と奈良の県境、静かな山あい。<br>京都府木津川市加茂町で、<br>農薬や肥料を施さない自然栽培のお茶を育てています。<br>ひとつひとつの作業を丁寧に楽しみながら。</p>
+    <a href="#products" class="cta">お茶を選ぶ</a>
+  </div>
+</section>
+
+<section class="about-section">
+  <div class="about-inner">
+    <div class="about-header">
+      <img src="images/bud_pick.jpg" alt="新芽を確かめる生産者">
+      <h2>つくり手について</h2>
+    </div>
+    <div class="about-text">
+      <p>2012年に季節労働という形でお茶仕事と出会い、<br>宇治茶の主産地でもある京都の加茂町で、2021年より仲間たちの協力のもと自身のお茶作りを始めました。</p>
+      <p>高齢になったお茶農家さんが茶畑を手放し、荒れ始めた畑を借りてコツコツと整備し直してお茶作りをしています。</p>
+      <p>自然栽培とはいえ人の手が入る以上、完全な自然ではなく、<br>どこかで人工的なものになるとも思っています。<br>それでもなお、心惹かれるのは深い山に分け入ったときの静けさ、その静寂を破るように轟音を上げて流れ落ちる滝、そして海に浮かび、満ちては引いていく波に感じる大自然の息づかい。<br>そんな自然の中に身を置いたときに感じる安らぎや美しさ力強さ、時には恐ろしささえも自分はとても好きで、大切にしたいと感じています。</p>
+      <p>お茶を育てるという機会をいただいたからには、その大自然が持つエッセンスが出来るかぎりそのまま残るようなお茶づくりをしてゆきたいと思っています。</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-head" id="products">
+  <h2>商品一覧</h2>
+</div>
+
+<section class="products-wrap" id="product-grid"></section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="fb"><img src="images/logo.png" alt="DOIT!FARM! ロゴ">DOIT!FARM!</div>
+      <p>〒619-1111 京都府木津川市加茂町山田西山田20 ／ お問い合わせ: info@example.com</p>
+    </div>
+    <p>&copy; 2026 DOIT!FARM! ／ <a href="tokusho.html" style="color:inherit; text-decoration:underline;">特定商取引法に基づく表記</a></p>
+  </div>
+</footer>
+
+<div id="overlay"></div>
+<div id="drawer" aria-label="ショッピングカート">
+  <div class="drawer-head">
+    <h3>カート</h3>
+    <button id="close-cart" aria-label="閉じる">&times;</button>
+  </div>
+  <div id="cart-items"></div>
+  <div class="drawer-foot">
+    <div id="checkout-error"></div>
+    <div class="subtotal-row">
+      <span>小計</span>
+      <span class="amt" id="subtotal">¥0</span>
+    </div>
+    <div class="subtotal-row">
+      <span>送料</span>
+      <span class="amt" id="shipping-amt">¥0</span>
+    </div>
+    <div class="subtotal-row total-row">
+      <span>合計</span>
+      <span class="amt" id="grand-total">¥0</span>
+    </div>
+    <p class="ship-note" id="free-ship-note"></p>
+
+    <div class="pay-method-select">
+      <button type="button" class="pay-method-btn active" data-method="card">カード等で支払う</button>
+      <button type="button" class="pay-method-btn" data-method="bank">銀行振込で注文する</button>
+    </div>
+
+    <div id="card-pay-section">
+      <button class="checkout-btn" id="checkout-btn">レジに進む</button>
+      <p class="ship-note">カード・Apple Pay・Google Pay等がご利用いただけます(送料込みの金額で決済されます)</p>
+    </div>
+
+    <div id="bank-pay-section" style="display:none;">
+      <div class="bank-box">
+        <p class="bank-box-title">お振込先</p>
+        <p>○○銀行 ○○支店<br>普通 1234567<br>口座名義: ドウイットファーム</p>
+        <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
+        <p class="bank-note">送料込みの合計金額をお振込みください。お振込の際、可能であれば注文番号をお名前の前などにご記入ください。ご入金確認後、発送のご連絡をいたします。</p>
+      </div>
+      <button class="checkout-btn" id="bank-confirm-btn">この内容をメールで送る</button>
+      <p class="ship-note">メール送信後、当店で内容を確認しご連絡いたします</p>
+    </div>
+    <p class="ship-note">沖縄県・離島へのお届けは、確認のうえ追加送料についてご連絡する場合があります</p>
+  </div>
+</div>
+
+
+<script>
+// ---------------------------------------------------------------
+// 商品データ
+// squareVariationId は Squareダッシュボード(商品ライブラリ)で商品を作成した後、
+// 各バリエーションに割り当てられる ID (例: 7XQK...) に置き換えてください。
+// ここが未設定のままだと決済に進めません。
+// ---------------------------------------------------------------
+const PRODUCTS = [
+  // 茶葉
+  { id:'kabusecha',           category:'茶葉', kind:'かぶせ煎茶', name:'かぶせ煎茶', price:1350, weight:'65g',    desc:'収穫前に覆いをかぶせ、旨味を引き出しました。香りも楽しめるよう浅蒸しで仕上げてあります。', color:'#5C7A52', squareVariationId:'XBJ7AKOCPQFVMKZODI7RUNO5', labelName:'緑茶', labelIngredients:'緑茶(京都府産)' },
+  { id:'genmaicha',           category:'茶葉', kind:'玄米茶',     name:'玄米茶', price:1350, weight:'130g',   desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'UFLZSMLTOZKFOCDA34LOZKA3', labelName:'緑茶(玄米茶)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)' },
+  { id:'hojicha_fukairi',     category:'茶葉', kind:'ほうじ茶',   name:'深煎りほうじ茶', price:800,  weight:'100g',   desc:'大きく育てた一番茶の茶葉をしっかりと焙煎し香ばしく仕上げてあります。', color:'#9C6B33', squareVariationId:'2EUCCKZUEUFYM6TMJZG4GOXI', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
+  { id:'hojicha_fukairi_500', category:'茶葉', kind:'ほうじ茶(大容量)', name:'深煎りほうじ茶(大容量)', price:3500, weight:'500g', desc:'たっぷり楽しみたい方向けの大容量サイズ。', color:'#8A5A2A', squareVariationId:'B6FE47PZFMYIVO4OTBBCWNEN', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
+  { id:'hojicha_asairi',      category:'茶葉', kind:'ほうじ茶',   name:'浅煎りほうじ茶', price:800,  weight:'90g',    desc:'浅めに焙煎することで、ほうじ茶の香ばしさと緑茶の爽やかさの両方を楽しめます。', color:'#B98A4A', squareVariationId:'BMQVGEDJCDZI5PTIMZLILGEE', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
+  { id:'wakoucha',            category:'茶葉', kind:'和紅茶',     name:'和紅茶', price:800,  weight:'50g',    desc:'日本茶品種(やぶきた)で製茶した和紅茶。甘さ優位、渋さは少なく軽やかな飲み口。', color:'#A6532E', squareVariationId:'PT4PB7LA7XMPX7K4LRNB4L7S', labelName:'紅茶', labelIngredients:'紅茶(京都府産)' },
+
+  // ティーバッグ
+  { id:'tb_kabusecha',  category:'ティーバッグ', kind:'かぶせ煎茶', name:'かぶせ煎茶',   price:900, weight:'3g×8個入り', desc:'収穫前に覆いをかぶせ、旨味を引き出しました。香りも楽しめるよう浅蒸しで仕上げてあります。', color:'#5C7A52', squareVariationId:'I22YB54IFNUEWAVHSO4LQ3T2', labelName:'緑茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
+  { id:'tb_genmaicha',  category:'ティーバッグ', kind:'玄米茶',     name:'玄米茶',       price:900, weight:'3g×8個入り', desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'ZVFQUDETNMR5JCZXGADQNLFK', soldOut:true, labelName:'緑茶(玄米茶・ティーバッグ)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)' },
+  { id:'tb_fukairi',    category:'ティーバッグ', kind:'ほうじ茶',   name:'深煎りほうじ茶', price:800, weight:'3g×8個入り', desc:'大きく育てた一番茶の茶葉をしっかりと焙煎し香ばしく仕上げてあります。', color:'#9C6B33', squareVariationId:'EC5DM3LUZYIQUT5H2OEFSSU6', labelName:'ほうじ茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
+  { id:'tb_asairi',     category:'ティーバッグ', kind:'ほうじ茶',   name:'浅煎りほうじ茶', price:800, weight:'3g×8個入り', desc:'浅めに焙煎することで、ほうじ茶の香ばしさと緑茶の爽やかさの両方を楽しめます。', color:'#B98A4A', squareVariationId:'4NN4ZWD7LTCQ6DLQFHV4EI7B', labelName:'ほうじ茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
+  { id:'tb_wakoucha',   category:'ティーバッグ', kind:'和紅茶',     name:'和紅茶',       price:800, weight:'3g×8個入り', desc:'日本茶品種(やぶきた)で製茶した和紅茶。甘さ優位、渋さは少なく軽やかな飲み口。', color:'#A6532E', squareVariationId:'ZRVHMDRW2RIHK6YVZXQOUKML', labelName:'紅茶(ティーバッグ)', labelIngredients:'紅茶(京都府産)' },
+
+  // 粉茶
+  { id:'matcha_uji',    category:'粉茶', kind:'抹茶',           name:'宇治抹茶', price:2300, weight:'30g', desc:'一番茶の原料を伝統製法の石臼挽きでじっくり時間をかけて仕上げました。', color:'#4C7A3E', squareVariationId:'SHM2NM4EPLXGAT2NY2FQPUMM', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
+  { id:'matcha_kyoto',  category:'粉茶', kind:'抹茶',           name:'京都抹茶', price:1700, weight:'30g', desc:'宇治抹茶と同じ一番茶の原料を現代の微粉砕技術(ボールミル製法)で仕上げました。ラテやお菓子作り、もちろんお抹茶としても。幅広くご利用下さい。', color:'#6E9A4E', squareVariationId:'5KHQ4FFGIW2SXXC6GQMS63ZT', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
+  { id:'hojicha_powder',category:'粉茶', kind:'ほうじ茶',       name:'ほうじ茶パウダー', price:1000,  weight:'50g', desc:'深煎りほうじ茶を抹茶のように微粉末に仕上げました。ラテやお菓子作りなど自由にご利用下さい。', color:'#B8912E', squareVariationId:'BUE6TWFCF564AXLQ77OJZ4PR', labelName:'ほうじ茶(粉末)', labelIngredients:'ほうじ茶(京都府産)' },
+];
+
+const CATEGORIES = ['茶葉', 'ティーバッグ', '粉茶'];
+const CATEGORY_NOTES = {
+  'ティーバッグ': '※ティーバッグの素材について<br>100%植物由来の生分解性フィルター素材「ソイロン」を使用しています。'
+};
+
+
+const leafSVG = (color) => `
+  <svg viewBox="0 0 100 100" fill="none">
+    <path d="M50 88C50 88 20 68 20 40C20 20 34 8 50 8C66 8 80 20 80 40C80 68 50 88 50 88Z" stroke="${color}" stroke-width="2.2"/>
+    <path d="M50 84V14" stroke="${color}" stroke-width="1.4" opacity="0.7"/>
+    <path d="M50 34C50 34 34 40 28 56" stroke="${color}" stroke-width="1.2" opacity="0.6"/>
+    <path d="M50 50C50 50 66 56 72 72" stroke="${color}" stroke-width="1.2" opacity="0.6"/>
+  </svg>`;
+
+const fmt = (n) => '¥' + n.toLocaleString('ja-JP');
+
+// 送料設定: 全国一律900円、8,000円以上で送料無料
+const SHIPPING_FLAT = 900;
+const FREE_SHIPPING_MIN = 8000;
+const calcShipping = (subtotal) => subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
+
+// ---------------------------------------------------------------
+// カート状態 (localStorage に保存)
+// ---------------------------------------------------------------
+let cart = JSON.parse(localStorage.getItem('uji-cart') || '{}'); // {id: qty}
+
+function saveCart(){
+  localStorage.setItem('uji-cart', JSON.stringify(cart));
+  renderCartBadge();
+  renderCartDrawer();
+}
+
+function renderCartBadge(){
+  const count = Object.values(cart).reduce((a,b)=>a+b,0);
+  const el = document.getElementById('cart-count');
+  el.textContent = count;
+  el.classList.toggle('hidden', count === 0);
+}
+
+function renderProducts(){
+  const grid = document.getElementById('product-grid');
+
+  grid.innerHTML = CATEGORIES.map(cat => `
+    <div class="category-block">
+      <h3 class="category-heading">${cat}</h3>
+      ${CATEGORY_NOTES[cat] ? `<p class="category-note">${CATEGORY_NOTES[cat]}</p>` : ''}
+      <div class="products">
+        ${PRODUCTS.filter(p => p.category === cat).map(p => `
+          <div class="card${p.soldOut ? ' sold-out' : ''}">
+            <div class="card-art">${leafSVG(p.color)}${p.soldOut ? '<span class="sold-out-badge">品切れ</span>' : ''}</div>
+            <div class="card-body">
+              <div class="kind">${p.kind} ・ ${p.weight}</div>
+              <h3>${p.name}</h3>
+              <p class="desc">${p.desc}</p>
+              <div class="card-foot">
+                <div class="price">${fmt(p.price)}<span> 税込</span></div>
+                ${p.soldOut
+                  ? `<button class="add-btn" disabled>品切れ中</button>`
+                  : `<button class="add-btn" data-id="${p.id}">カートに追加</button>`}
+              </div>
+              <details class="product-label">
+                <summary>商品詳細(表示事項)</summary>
+                <dl>
+                  <dt>名称</dt><dd>${p.labelName}</dd>
+                  <dt>原材料名</dt><dd>${p.labelIngredients}</dd>
+                  <dt>栽培方法</dt><dd>自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)</dd>
+                  <dt>内容量</dt><dd>${p.weight}</dd>
+                  <dt>賞味期限</dt><dd>枠外下部に記載</dd>
+                  <dt>保存方法</dt><dd>直射日光・高温多湿を避け、常温で保存してください</dd>
+                  <dt>販売者</dt><dd>DOIT!FARM! 福屋健治<br>京都府木津川市加茂町山田西山田20</dd>
+                </dl>
+              </details>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.add-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id;
+      cart[id] = (cart[id]||0) + 1;
+      saveCart();
+      btn.textContent = '追加しました';
+      btn.classList.add('added');
+      setTimeout(()=>{ btn.textContent='カートに追加'; btn.classList.remove('added'); }, 1200);
+    });
+  });
+}
+
+function renderCartDrawer(){
+  const wrap = document.getElementById('cart-items');
+  const ids = Object.keys(cart).filter(id => cart[id] > 0);
+
+  if(ids.length === 0){
+    wrap.innerHTML = '<div id="cart-empty">カートに商品がありません</div>';
+    document.getElementById('subtotal').textContent = fmt(0);
+    document.getElementById('shipping-amt').textContent = fmt(0);
+    document.getElementById('grand-total').textContent = fmt(0);
+    document.getElementById('free-ship-note').textContent = '';
+    document.getElementById('checkout-btn').disabled = true;
+    return;
+  }
+
+  document.getElementById('checkout-btn').disabled = false;
+
+  let subtotal = 0;
+  wrap.innerHTML = ids.map(id => {
+    const p = PRODUCTS.find(x=>x.id===id);
+    const qty = cart[id];
+    subtotal += p.price * qty;
+    return `
+      <div class="cart-row" data-id="${id}">
+        <div class="ci-art">${leafSVG(p.color)}</div>
+        <div class="ci-info">
+          <div class="name">${p.name}</div>
+          <div class="qty-row">
+            <button class="dec">−</button>
+            <span>${qty}</span>
+            <button class="inc">+</button>
+            <button class="remove">削除</button>
+          </div>
+        </div>
+        <div class="ci-price">${fmt(p.price * qty)}</div>
+      </div>
+    `;
+  }).join('');
+
+  const shipping = calcShipping(subtotal);
+  const grandTotal = subtotal + shipping;
+
+  document.getElementById('subtotal').textContent = fmt(subtotal);
+  document.getElementById('shipping-amt').textContent = shipping === 0 ? '無料' : fmt(shipping);
+  document.getElementById('grand-total').textContent = fmt(grandTotal);
+
+  const freeNote = document.getElementById('free-ship-note');
+  if(shipping > 0){
+    freeNote.textContent = `あと${fmt(FREE_SHIPPING_MIN - subtotal)}のご注文で送料無料`;
+  } else {
+    freeNote.textContent = '送料無料になりました';
+  }
+
+  wrap.querySelectorAll('.cart-row').forEach(row=>{
+    const id = row.dataset.id;
+    row.querySelector('.inc').addEventListener('click', ()=>{ cart[id]++; saveCart(); });
+    row.querySelector('.dec').addEventListener('click', ()=>{
+      cart[id]--; if(cart[id] <= 0) delete cart[id];
+      saveCart();
+    });
+    row.querySelector('.remove').addEventListener('click', ()=>{ delete cart[id]; saveCart(); });
+  });
+}
+
+// ---------------------------------------------------------------
+// カート開閉
+// ---------------------------------------------------------------
+const overlay = document.getElementById('overlay');
+const drawer = document.getElementById('drawer');
+function openCart(){ overlay.classList.add('open'); drawer.classList.add('open'); }
+function closeCart(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+document.getElementById('cart-btn').addEventListener('click', openCart);
+document.getElementById('close-cart').addEventListener('click', closeCart);
+overlay.addEventListener('click', closeCart);
+
+// ---------------------------------------------------------------
+// レジに進む → バックエンドの /api/create-checkout-session を呼び、
+// Square Checkout のページへリダイレクトする
+// ---------------------------------------------------------------
+document.getElementById('checkout-btn').addEventListener('click', async () => {
+  const errBox = document.getElementById('checkout-error');
+  errBox.style.display = 'none';
+  const items = Object.keys(cart).filter(id=>cart[id]>0).map(id=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    return { variationId: p.squareVariationId, quantity: cart[id] };
+  });
+  if(items.length === 0) return;
+
+  const subtotal = Object.keys(cart).filter(id=>cart[id]>0).reduce((sum,id)=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    return sum + p.price * cart[id];
+  }, 0);
+  const shippingAmount = calcShipping(subtotal);
+
+  const btn = document.getElementById('checkout-btn');
+  btn.disabled = true;
+  btn.textContent = '処理中…';
+
+  try{
+    const res = await fetch('/api/create-checkout-session', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ items, shippingAmount })
+    });
+    if(!res.ok) throw new Error('チェックアウトの作成に失敗しました');
+    const data = await res.json();
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      throw new Error('決済ページのURLを取得できませんでした');
+    }
+  } catch(e){
+    errBox.textContent = 'エラー: ' + e.message + '(バックエンドの設定をご確認ください)';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'レジに進む';
+  }
+});
+
+// ---------------------------------------------------------------
+// 支払い方法の切り替え(カード等 / 銀行振込)
+// ---------------------------------------------------------------
+const cardSection = document.getElementById('card-pay-section');
+const bankSection = document.getElementById('bank-pay-section');
+let currentOrderNumber = null;
+
+document.querySelectorAll('.pay-method-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.pay-method-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const method = btn.dataset.method;
+    if(method === 'bank'){
+      cardSection.style.display = 'none';
+      bankSection.style.display = 'block';
+      if(!currentOrderNumber){
+        currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
+        document.getElementById('bank-order-number').textContent = currentOrderNumber;
+      }
+    } else {
+      bankSection.style.display = 'none';
+      cardSection.style.display = 'block';
+    }
+  });
+});
+
+// ---------------------------------------------------------------
+// 銀行振込 → 注文内容をメールで送る(mailtoリンクを開く)
+// ---------------------------------------------------------------
+document.getElementById('bank-confirm-btn').addEventListener('click', () => {
+  const ids = Object.keys(cart).filter(id => cart[id] > 0);
+  if(ids.length === 0) return;
+
+  if(!currentOrderNumber){
+    currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
+    document.getElementById('bank-order-number').textContent = currentOrderNumber;
+  }
+
+  let subtotal = 0;
+  const lines = ids.map(id => {
+    const p = PRODUCTS.find(x => x.id === id);
+    const qty = cart[id];
+    subtotal += p.price * qty;
+    return `・${p.name}(${p.weight}) × ${qty}　${fmt(p.price * qty)}`;
+  });
+
+  const shipping = calcShipping(subtotal);
+  const grandTotal = subtotal + shipping;
+
+  const bodyLines = [
+    `注文番号: ${currentOrderNumber}`,
+    '',
+    '【注文内容】',
+    ...lines,
+    '',
+    `小計: ${fmt(subtotal)}`,
+    `送料: ${shipping === 0 ? '無料' : fmt(shipping)}`,
+    `合計: ${fmt(grandTotal)}`,
+    '',
+    'お名前:',
+    'ご住所:',
+    '電話番号:',
+    '',
+    '(上記の空欄にご記入のうえ、このまま送信してください)',
+    '(沖縄県・離島の場合、確認のうえ追加送料についてご連絡することがあります)',
+  ];
+
+  const subject = encodeURIComponent(`銀行振込でのご注文(注文番号: ${currentOrderNumber})`);
+  const body = encodeURIComponent(bodyLines.join('\n'));
+
+  window.location.href = `mailto:info@example.com?subject=${subject}&body=${body}`;
+});
+
+renderProducts();
+renderCartBadge();
+renderCartDrawer();
+</script>
+</body>
+</html>
