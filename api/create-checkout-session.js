@@ -7,30 +7,15 @@
 // 絶対にフロントエンドのコードには書かないでください。
 //
 // 必要な環境変数:
-// SQUARE_ACCESS_TOKEN … Square の アクセストークン(本番 or サンドボックス)
-// SQUARE_LOCATION_ID … 決済を紐づける Square のロケーションID
-// SQUARE_ENV … "sandbox" にするとテスト環境を使用(それ以外・未設定なら本番)
+//   SQUARE_ACCESS_TOKEN  … Square の アクセストークン(本番 or サンドボックス)
+//   SQUARE_LOCATION_ID   … 決済を紐づける Square のロケーションID
+//   SQUARE_ENV           … "sandbox" にするとテスト環境を使用(未設定なら本番)
 
 const SQUARE_API_BASE = process.env.SQUARE_ENV === 'sandbox'
   ? 'https://connect.squareupsandbox.com'
   : 'https://connect.squareup.com';
 
-const SQUARE_VERSION = '2025-01-23';
-
-// 送料の設定
-// index.html の SHIPPING_FLAT / FREE_SHIPPING_MIN と同じ値にしてください。
-const SHIPPING_FLAT = 900;       // 通常の送料(円)
-const FREE_SHIPPING_MIN = 8000;  // この金額(商品合計)以上で送料無料(円)
-
 const crypto = require('crypto');
-
-function squareHeaders() {
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
-    'Square-Version': SQUARE_VERSION,
-  };
-}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -39,12 +24,76 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { items } = req.body || {};
+    const { items, shippingAmount } = req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
       res.status(400).json({ error: 'カートが空です' });
       return;
     }
 
-    // 受け取った内容を整えてチェック
-    const cleanItems = items.map(i => ({
+    // フロントエンドのダミー ID (SQUARE_VARIATION_REPLACE_...) が
+    // 残っている場合はここで弾きます。
+    const invalid = items.find(i => !i.variationId || i.variationId.includes('REPLACE'));
+    if (invalid) {
+      res.status(400).json({
+        error: 'Square の商品ID(バリエーションID)が設定されていない商品があります。index.html の PRODUCTS を確認してください。'
+      });
+      return;
+    }
+
+    const line_items = items.map(i => ({
+      quantity: String(i.quantity),
+      catalog_object_id: i.variationId,
+    }));
+
+    // 送料は商品カタログに存在しないため、金額指定のアドホックな行として追加します。
+    // フロントエンド(index.html)の SHIPPING_FLAT / FREE_SHIPPING_MIN と
+    // 計算ロジックを揃えてください。0円(送料無料)のときは行を追加しません。
+    if (typeof shippingAmount === 'number' && shippingAmount > 0) {
+      line_items.push({
+        name: '送料',
+        quantity: '1',
+        base_price_money: { amount: shippingAmount, currency: 'JPY' },
+      });
+    }
+
+    const origin = req.headers.origin || `https://${req.headers.host}`;
+
+    const response = await fetch(`${SQUARE_API_BASE}/v2/online-checkout/payment-links`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
+        'Square-Version': '2025-01-23',
+      },
+      body: JSON.stringify({
+        idempotency_key: crypto.randomUUID(),
+        order: {
+          location_id: process.env.SQUARE_LOCATION_ID,
+          line_items,
+        },
+        checkout_options: {
+          // 発送先の住所をお客様に入力してもらいます(配送に必要なため)。
+          // 沖縄県・離島への追加送料は自動計算されないので、該当する場合は
+          // 届いた注文を確認のうえ、別途ご連絡ください。
+          ask_for_shipping_address: true,
+          redirect_url: `${origin}/?checkout=success`,
+        },
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(data);
+      const message = data.errors && data.errors[0] ? data.errors[0].detail : '決済セッションの作成に失敗しました';
+      res.status(500).json({ error: message });
+      return;
+    }
+
+    res.status(200).json({ url: data.payment_link.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message || '決済セッションの作成に失敗しました' });
+  }
+};
