@@ -49,6 +49,13 @@ function formatPostal(postal) {
   return /^\d{7}$/.test(digits) ? `${digits.slice(0, 3)}-${digits.slice(3)}` : '';
 }
 
+// 都道府県名 → JISコード("01"〜"47")
+const PREFECTURES = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+function prefCode(name) {
+  const i = PREFECTURES.indexOf(clean(name, 10));
+  return i >= 0 ? String(i + 1).padStart(2, '0') : '';
+}
+
 // お届け先情報から、Square の決済画面に最初から入れておく内容を作ります。
 function buildPrePopulated(customer, level) {
   if (!customer || typeof customer !== 'object') return null;
@@ -61,11 +68,15 @@ function buildPrePopulated(customer, level) {
   if (phone) data.buyer_phone_number = phone;
 
   if (level === 'full') {
+    // Square の日本向け決済画面は、事前入力の first_name を「姓」の欄に表示するため、
+    // 画面上で正しく並ぶよう 姓 → first_name、名 → last_name の順で渡します。
+    // (お客様が送信した時点で、欄の表示どおり 姓・名 として記録されます)
     const address = {
-      first_name: clean(customer.firstName, 50),
-      last_name: clean(customer.lastName, 50),
+      first_name: clean(customer.lastName, 50),
+      last_name: clean(customer.firstName, 50),
       postal_code: formatPostal(customer.postal),
-      administrative_district_level_1: clean(customer.pref, 10),
+      // 都道府県は名前ではなく番号(JISコード: 京都府 = "26")で渡す必要があります
+      administrative_district_level_1: prefCode(customer.pref),
       locality: clean(customer.city, 100),
       address_line_1: clean(customer.address1, 200),
       address_line_2: clean(customer.address2, 200),
