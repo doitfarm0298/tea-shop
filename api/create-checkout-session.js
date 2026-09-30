@@ -4,6 +4,10 @@
 // フロントエンド (index.html) から
 //   { items: [{variationId, quantity}, ...], customer: {...お届け先} }
 // を受け取り、Square Checkout API (Payment Links) で決済ページを作成し、その URL を返します。
+//
+// お届け先はサイト側で入力してもらい、Square の注文データに添えて送ります。
+// (Square の決済画面では住所を聞かないので、お客様の入力は1回で済みます)
+//
 // アクセストークン (SQUARE_ACCESS_TOKEN) はここ(サーバー側)でのみ使用し、
 // 絶対にフロントエンドのコードには書かないでください。
 //
@@ -36,57 +40,35 @@ function squareHeaders() {
 // 文字列を整える(長すぎる入力は切り詰め)
 const clean = (v, max = 100) => String(v == null ? '' : v).trim().slice(0, max);
 
+const PREFECTURES = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+
 // 日本の電話番号 → Square が求める国際形式 (+81...)
 function toE164JP(phone) {
   const digits = clean(phone, 30).replace(/\D/g, '');
-  if (/^0\d{9,10}$/.test(digits)) return '+81' + digits.slice(1);
-  return '';
+  return /^0\d{9,10}$/.test(digits) ? '+81' + digits.slice(1) : '';
 }
 
-// 郵便番号 → 123-4567 の形
-function formatPostal(postal) {
-  const digits = clean(postal, 20).replace(/\D/g, '');
-  return /^\d{7}$/.test(digits) ? `${digits.slice(0, 3)}-${digits.slice(3)}` : '';
-}
-
-// 都道府県名 → JISコード("01"〜"47")
-const PREFECTURES = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
-function prefCode(name) {
-  const i = PREFECTURES.indexOf(clean(name, 10));
-  return i >= 0 ? String(i + 1).padStart(2, '0') : '';
-}
-
-// お届け先情報から、Square の決済画面に最初から入れておく内容を作ります。
-function buildPrePopulated(customer, level) {
-  if (!customer || typeof customer !== 'object') return null;
-  const data = {};
-
-  const email = clean(customer.email, 254);
-  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) data.buyer_email = email;
-
-  const phone = toE164JP(customer.phone);
-  if (phone) data.buyer_phone_number = phone;
-
-  if (level === 'full') {
-    // Square の日本向け決済画面は、事前入力の first_name を「姓」の欄に表示するため、
-    // 画面上で正しく並ぶよう 姓 → first_name、名 → last_name の順で渡します。
-    // (お客様が送信した時点で、欄の表示どおり 姓・名 として記録されます)
-    const address = {
-      first_name: clean(customer.lastName, 50),
-      last_name: clean(customer.firstName, 50),
-      postal_code: formatPostal(customer.postal),
-      // 都道府県は名前ではなく番号(JISコード: 京都府 = "26")で渡す必要があります
-      administrative_district_level_1: prefCode(customer.pref),
-      locality: clean(customer.city, 100),
-      address_line_1: clean(customer.address1, 200),
-      address_line_2: clean(customer.address2, 200),
-      country: 'JP',
-    };
-    Object.keys(address).forEach(k => { if (!address[k]) delete address[k]; });
-    if (Object.keys(address).length > 1) data.buyer_address = address;
+// お届け先を確認して整えます。足りない項目があれば null
+function normalizeCustomer(c) {
+  if (!c || typeof c !== 'object') return null;
+  const postalDigits = clean(c.postal, 20).replace(/\D/g, '');
+  const n = {
+    lastName: clean(c.lastName, 50),
+    firstName: clean(c.firstName, 50),
+    email: clean(c.email, 254),
+    phoneRaw: clean(c.phone, 30),
+    phone: toE164JP(c.phone),
+    postal: /^\d{7}$/.test(postalDigits) ? `${postalDigits.slice(0, 3)}-${postalDigits.slice(3)}` : '',
+    pref: PREFECTURES.includes(clean(c.pref, 10)) ? clean(c.pref, 10) : '',
+    city: clean(c.city, 100),
+    address1: clean(c.address1, 200),
+    address2: clean(c.address2, 200),
+  };
+  const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(n.email);
+  if (!n.lastName || !n.firstName || !emailOk || !n.phone || !n.postal || !n.pref || !n.city || !n.address1) {
+    return null;
   }
-
-  return Object.keys(data).length ? data : null;
+  return n;
 }
 
 module.exports = async (req, res) => {
@@ -100,6 +82,12 @@ module.exports = async (req, res) => {
 
     if (!Array.isArray(items) || items.length === 0) {
       res.status(400).json({ error: 'カートが空です' });
+      return;
+    }
+
+    const c = normalizeCustomer(customer);
+    if (!c) {
+      res.status(400).json({ error: 'お届け先の入力内容を確認してください' });
       return;
     }
 
@@ -162,42 +150,106 @@ module.exports = async (req, res) => {
     }));
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
+    const fullName = `${c.lastName} ${c.firstName}`;
 
-    const checkout_options = {
-      // 発送先の住所をお客様に入力してもらいます(配送に必要なため)。
-      // 沖縄県・離島への追加送料は自動計算されないので、該当する場合は
-      // 届いた注文を確認のうえ、別途ご連絡ください。
-      ask_for_shipping_address: true,
-      redirect_url: `${origin}/?checkout=success`,
-    };
+    // 支払いに付けるメモ(どの方法で作成しても、Square の取引画面でお届け先が分かるように)
+    const payment_note = [
+      '【お届け先】',
+      fullName,
+      `〒${c.postal} ${c.pref}${c.city}${c.address1}${c.address2 ? ' ' + c.address2 : ''}`,
+      `TEL ${c.phoneRaw}`,
+      c.email,
+    ].join('\n').slice(0, 500);
 
-    // 送料は Square の「配送料」として付けます。0円(送料無料)のときは付けません。
-    if (shippingAmount > 0) {
-      checkout_options.shipping_fee = {
-        name: '送料',
-        charge: { amount: shippingAmount, currency: 'JPY' },
-      };
-    }
+    // Square の注文に付ける「配送」情報
+    const shipmentFulfillment = (prefValue) => ({
+      type: 'SHIPMENT',
+      state: 'PROPOSED',
+      shipment_details: {
+        recipient: {
+          display_name: fullName,
+          email_address: c.email,
+          phone_number: c.phone,
+          address: {
+            postal_code: c.postal,
+            administrative_district_level_1: prefValue,
+            locality: c.city,
+            address_line_1: c.address1,
+            ...(c.address2 ? { address_line_2: c.address2 } : {}),
+            country: 'JP',
+          },
+        },
+      },
+    });
 
-    // 決済リンクを作成。
-    // お届け先の事前入力を Square が受け付けなかった場合に備えて、
-    // 「住所まで入れる」→「メール・電話だけ」→「事前入力なし」の順に試します。
-    const attempts = ['full', 'contact', 'none'];
+    const shippingFeeOption = shippingAmount > 0
+      ? { shipping_fee: { name: '送料', charge: { amount: shippingAmount, currency: 'JPY' } } }
+      : {};
+
+    const pre_populated_data = { buyer_email: c.email, buyer_phone_number: c.phone };
+
+    // 作り方の候補。Square が受け付けなかったら次を試します。
+    const prefCode = String(PREFECTURES.indexOf(c.pref) + 1).padStart(2, '0');
+    const strategies = [
+      {
+        name: 'fulfillment(都道府県名)+送料',
+        order: { fulfillments: [shipmentFulfillment(c.pref)] },
+        checkout: shippingFeeOption,
+      },
+      {
+        name: 'fulfillment(都道府県コード)+送料',
+        order: { fulfillments: [shipmentFulfillment(prefCode)] },
+        checkout: shippingFeeOption,
+      },
+      {
+        name: 'メモのみ+送料',
+        order: {},
+        checkout: shippingFeeOption,
+      },
+      {
+        name: 'メモのみ+送料(サービス料)',
+        order: shippingAmount > 0 ? {
+          service_charges: [{
+            name: '送料',
+            amount_money: { amount: shippingAmount, currency: 'JPY' },
+            calculation_phase: 'TOTAL_PHASE',
+          }],
+        } : {},
+        checkout: {},
+      },
+      {
+        name: 'メモのみ+送料(商品の行)',
+        order: {},
+        checkout: {},
+        extraLine: shippingAmount > 0,
+      },
+    ];
+
     let data = null;
     let response = null;
+    let used = null;
 
-    for (const level of attempts) {
+    for (const s of strategies) {
+      const orderLines = s.extraLine
+        ? [...line_items, { name: '送料', quantity: '1', base_price_money: { amount: shippingAmount, currency: 'JPY' } }]
+        : line_items;
+
       const body = {
         idempotency_key: crypto.randomUUID(),
         order: {
           location_id: process.env.SQUARE_LOCATION_ID,
-          line_items,
+          line_items: orderLines,
+          ...s.order,
         },
-        checkout_options,
+        checkout_options: {
+          // 住所はサイトで入力済みなので、Square の画面では聞きません
+          ask_for_shipping_address: false,
+          redirect_url: `${origin}/?checkout=success`,
+          ...s.checkout,
+        },
+        pre_populated_data,
+        payment_note,
       };
-      const pre = level === 'none' ? null : buildPrePopulated(customer, level);
-      if (level !== 'none' && !pre) continue;
-      if (pre) body.pre_populated_data = pre;
 
       response = await fetch(`${SQUARE_API_BASE}/v2/online-checkout/payment-links`, {
         method: 'POST',
@@ -206,9 +258,9 @@ module.exports = async (req, res) => {
       });
       data = await response.json();
 
-      if (response.ok) break;
-      console.error(`payment link failed (prefill: ${level})`, JSON.stringify(data));
-      // 400 以外(認証エラーなど)は、事前入力を外しても直らないので打ち切り
+      if (response.ok) { used = s.name; break; }
+      console.error(`payment link failed [${s.name}]`, JSON.stringify(data));
+      // 400 以外(認証エラーなど)は、作り方を変えても直らないので打ち切り
       if (response.status !== 400) break;
     }
 
@@ -218,6 +270,7 @@ module.exports = async (req, res) => {
       return;
     }
 
+    console.log(`payment link created [${used}]`);
     res.status(200).json({ url: data.payment_link.url });
   } catch (err) {
     console.error(err);
