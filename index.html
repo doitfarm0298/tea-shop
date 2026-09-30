@@ -605,7 +605,7 @@
     <div id="card-pay-section">
       <div id="customer-form">
         <p class="cf-title">お届け先</p>
-        <p class="cf-lead">入力した内容は、次のお支払い画面に反映されます。</p>
+        <p class="cf-lead">入力した内容は次のお支払い画面に反映されます(都道府県のみ、お支払い画面で選択してください)。郵便番号を入れると住所が自動で入ります。</p>
         <div class="cf-grid">
           <div class="cf-field">
             <label for="cf-lastName">姓</label>
@@ -636,7 +636,7 @@
             <input id="cf-city" autocomplete="address-level2">
           </div>
           <div class="cf-field full">
-            <label for="cf-address1">町名・番地</label>
+            <label for="cf-address1">町名・番地(番地まで入力してください)</label>
             <input id="cf-address1" autocomplete="address-line1">
           </div>
           <div class="cf-field full">
@@ -881,6 +881,56 @@ function initCustomerForm(){
   });
   CF_FIELDS.forEach(k => {
     document.getElementById('cf-' + k).addEventListener('input', e => e.target.classList.remove('invalid'));
+  });
+  document.getElementById('cf-postal').addEventListener('input', onPostalInput);
+}
+
+// ---------------------------------------------------------------
+// 郵便番号から住所を自動入力(zipcloud: 日本郵便のデータを使った無料サービス)
+// ---------------------------------------------------------------
+let lastLookedUpPostal = '';
+let autoFilledAddress1 = '';
+function onPostalInput(){
+  const digits = toHalf(document.getElementById('cf-postal').value).replace(/\D/g, '');
+  if(digits.length !== 7 || digits === lastLookedUpPostal) return;
+  lastLookedUpPostal = digits;
+  lookupPostal(digits).then(r => {
+    if(!r) return;
+    const pref = document.getElementById('cf-pref');
+    const city = document.getElementById('cf-city');
+    const addr1 = document.getElementById('cf-address1');
+    pref.value = r.address1;
+    city.value = r.address2;
+    // まだ何も入っていないか、前回の自動入力のままなら町名を入れる
+    if(!addr1.value || addr1.value === autoFilledAddress1){
+      addr1.value = r.address3;
+      autoFilledAddress1 = r.address3;
+    }
+    [pref, city, addr1].forEach(el => el.classList.remove('invalid'));
+    // 続けて番地を入力できるよう、町名の欄へ
+    addr1.focus();
+    const end = addr1.value.length;
+    try { addr1.setSelectionRange(end, end); } catch(e) {}
+  });
+}
+function lookupPostal(zip){
+  return new Promise(resolve => {
+    const cbName = 'zipcb_' + Date.now();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => finish(null), 5000);
+    function finish(result){
+      clearTimeout(timer);
+      delete window[cbName];
+      script.remove();
+      resolve(result);
+    }
+    window[cbName] = (data) => {
+      const r = data && data.status === 200 && data.results && data.results[0];
+      finish(r || null);
+    };
+    script.onerror = () => finish(null);
+    script.src = `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}&callback=${cbName}`;
+    document.head.appendChild(script);
   });
 }
 function readCustomer(){
