@@ -882,56 +882,45 @@ function initCustomerForm(){
   CF_FIELDS.forEach(k => {
     document.getElementById('cf-' + k).addEventListener('input', e => e.target.classList.remove('invalid'));
   });
-  document.getElementById('cf-postal').addEventListener('input', onPostalInput);
+  const postalEl = document.getElementById('cf-postal');
+  ['input', 'change', 'blur'].forEach(ev => postalEl.addEventListener(ev, onPostalInput));
 }
 
 // ---------------------------------------------------------------
-// 郵便番号から住所を自動入力(zipcloud: 日本郵便のデータを使った無料サービス)
+// 郵便番号から住所を自動入力(サーバーの /api/zip 経由で検索)
 // ---------------------------------------------------------------
 let lastLookedUpPostal = '';
 let autoFilledAddress1 = '';
 function onPostalInput(){
   const digits = toHalf(document.getElementById('cf-postal').value).replace(/\D/g, '');
-  if(digits.length !== 7 || digits === lastLookedUpPostal) return;
+  if(digits.length !== 7) return;
+  const cityEmpty = !document.getElementById('cf-city').value;
+  // 同じ番号で検索済み、かつ住所も入っていれば何もしない
+  if(digits === lastLookedUpPostal && !cityEmpty) return;
   lastLookedUpPostal = digits;
   lookupPostal(digits).then(r => {
     if(!r) return;
     const pref = document.getElementById('cf-pref');
     const city = document.getElementById('cf-city');
     const addr1 = document.getElementById('cf-address1');
-    pref.value = r.address1;
-    city.value = r.address2;
+    pref.value = r.pref;
+    city.value = r.city;
     // まだ何も入っていないか、前回の自動入力のままなら町名を入れる
     if(!addr1.value || addr1.value === autoFilledAddress1){
-      addr1.value = r.address3;
-      autoFilledAddress1 = r.address3;
+      addr1.value = r.town;
+      autoFilledAddress1 = r.town;
     }
     [pref, city, addr1].forEach(el => el.classList.remove('invalid'));
-    // 続けて番地を入力できるよう、町名の欄へ
-    addr1.focus();
-    const end = addr1.value.length;
-    try { addr1.setSelectionRange(end, end); } catch(e) {}
   });
 }
-function lookupPostal(zip){
-  return new Promise(resolve => {
-    const cbName = 'zipcb_' + Date.now();
-    const script = document.createElement('script');
-    const timer = setTimeout(() => finish(null), 5000);
-    function finish(result){
-      clearTimeout(timer);
-      delete window[cbName];
-      script.remove();
-      resolve(result);
-    }
-    window[cbName] = (data) => {
-      const r = data && data.status === 200 && data.results && data.results[0];
-      finish(r || null);
-    };
-    script.onerror = () => finish(null);
-    script.src = `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}&callback=${cbName}`;
-    document.head.appendChild(script);
-  });
+async function lookupPostal(zip){
+  try{
+    const res = await fetch('/api/zip?zipcode=' + zip);
+    if(!res.ok) return null;
+    return await res.json();
+  } catch(e){
+    return null;
+  }
 }
 function readCustomer(){
   const c = {};
@@ -980,6 +969,7 @@ checkoutBtn.addEventListener('click', async () => {
   if(!customerForm.classList.contains('open')){
     customerForm.classList.add('open');
     checkoutBtn.textContent = 'お支払いへ進む';
+    onPostalInput();
     customerForm.scrollIntoView({ behavior:'smooth', block:'start' });
     return;
   }
