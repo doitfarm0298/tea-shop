@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DOIT!FARM! ― 自然栽培の宇治茶</title>
+<meta name="description" content="京都府木津川市加茂町で、農薬や肥料を施さない自然栽培のお茶を育てています。煎茶・ほうじ茶・和紅茶・抹茶をオンラインでお届けします。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DOIT!FARM!">
+<meta property="og:title" content="DOIT!FARM! ― 自然栽培の宇治茶">
+<meta property="og:description" content="京都府木津川市加茂町で、農薬や肥料を施さない自然栽培のお茶を育てています。煎茶・ほうじ茶・和紅茶・抹茶をオンラインでお届けします。">
+<meta property="og:url" content="https://doitfarm.com/">
+<meta property="og:image" content="https://doitfarm.com/images/cover_net_view.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="images/logo.png">
+<link rel="apple-touch-icon" href="images/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -38,6 +48,11 @@
     letter-spacing:.02em;
   }
   a{color:inherit;}
+  /* 日本語の改行: 言葉の途中で折り返さない */
+  body{word-break:auto-phrase; line-break:strict;}
+  p,dd,li{text-wrap:pretty; overflow-wrap:anywhere;}
+  h1,h2,h3{text-wrap:balance;}
+  .nb{display:inline-block;}
   img{max-width:100%;display:block;}
 
   /* ---------- header ---------- */
@@ -70,6 +85,17 @@
     color:var(--muted-dark);
     margin-top:2px;
     font-weight:400;
+  }
+  .brand-text{display:flex; align-items:center; gap:14px;}
+  .brand small{white-space:nowrap;}
+  @media (max-width:600px){
+    header{grid-template-columns:1fr auto; padding:12px 16px;}
+    header .brand{grid-column:1; justify-self:start;}
+    header #cart-btn{grid-column:2;}
+    .brand-text{flex-direction:column; align-items:flex-start; gap:0; line-height:1.25;}
+    .brand{font-size:1.15rem; gap:10px; letter-spacing:.06em;}
+    .brand img{width:42px; height:42px;}
+    .brand small{font-size:.72rem; letter-spacing:.12em;}
   }
   #cart-btn{
     position:relative;
@@ -155,10 +181,10 @@
     color:var(--text-light);
   }
   .hero-content h1{
-    font-size:clamp(2.1rem, 4.2vw, 3.3rem);
+    font-size:clamp(1.9rem, 4.2vw, 3.3rem);
     line-height:1.35;
     margin:0 0 22px;
-    max-width:16ch;
+    max-width:12em;
   }
   .hero-content p{
     max-width:48ch;
@@ -516,7 +542,7 @@
 <body>
 
 <header>
-  <div class="brand"><img src="images/logo.png" alt="DOIT!FARM! ロゴ">DOIT!FARM!<small>自然栽培の宇治茶</small></div>
+  <div class="brand"><img src="images/logo.png" alt="DOIT!FARM! ロゴ"><span class="brand-text"><span class="nb">DOIT!FARM!</span><small>自然栽培の宇治茶</small></span></div>
   <button id="cart-btn" aria-label="カートを開く">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
     <span id="cart-count" class="hidden">0</span>
@@ -538,8 +564,8 @@
   <img class="hero-logo" src="images/logo-white.png" alt="">
   <div class="hero-scrim"></div>
   <div class="hero-content">
-    <h1>大きな自然の中の小さな茶畑で。</h1>
-    <p>京都と奈良の県境、静かな山あい。<br>京都府木津川市加茂町で、<br>農薬や肥料を施さない自然栽培のお茶を育てています。<br>ひとつひとつの作業を丁寧に楽しみながら。</p>
+    <h1><span class="nb">大きな自然の中の</span><span class="nb">小さな茶畑で。</span></h1>
+    <p><span class="nb">京都と奈良の県境、</span><span class="nb">静かな山あい。</span><br><span class="nb">京都府木津川市</span><span class="nb">加茂町で、</span><br><span class="nb">農薬や肥料を施さない</span><span class="nb">自然栽培のお茶を</span><span class="nb">育てています。</span><br><span class="nb">ひとつひとつの作業を</span><span class="nb">丁寧に楽しみながら。</span></p>
     <a href="#products" class="cta">お茶を選ぶ</a>
   </div>
 </section>
@@ -551,10 +577,10 @@
       <h2>つくり手について</h2>
     </div>
     <div class="about-text">
-      <p>2012年に季節労働という形でお茶仕事と出会い、<br>宇治茶の主産地でもある京都の加茂町で、2021年より仲間たちの協力のもと自身のお茶作りを始めました。</p>
-      <p>高齢になったお茶農家さんが茶畑を手放し、荒れ始めた畑を借りてコツコツと整備し直してお茶作りをしています。</p>
-      <p>自然栽培とはいえ人の手が入る以上、完全な自然ではなく、<br>どこかで人工的なものになるとも思っています。<br>それでもなお、心惹かれるのは深い山に分け入ったときの静けさ、その静寂を破るように轟音を上げて流れ落ちる滝、そして海に浮かび、満ちては引いていく波に感じる大自然の息づかい。<br>そんな自然の中に身を置いたときに感じる安らぎや美しさ力強さ、時には恐ろしささえも自分はとても好きで、大切にしたいと感じています。</p>
-      <p>お茶を育てるという機会をいただいたからには、その大自然が持つエッセンスが出来るかぎりそのまま残るようなお茶づくりをしてゆきたいと思っています。</p>
+      <p><span class="nb">2012年に</span><span class="nb">季節労働という形で</span><span class="nb">お茶仕事と出会い、</span><br><span class="nb">宇治茶の主産地でもある</span><span class="nb">京都の加茂町で、</span><span class="nb">2021年より</span><span class="nb">仲間たちの協力のもと</span><span class="nb">自身のお茶作りを</span><span class="nb">始めました。</span></p>
+      <p><span class="nb">高齢になった</span><span class="nb">お茶農家さんが</span><span class="nb">茶畑を手放し、</span><span class="nb">荒れ始めた畑を借りて</span><span class="nb">コツコツと整備し直して</span><span class="nb">お茶作りをしています。</span></p>
+      <p><span class="nb">自然栽培とはいえ</span><span class="nb">人の手が入る以上、</span><span class="nb">完全な自然ではなく、</span><br><span class="nb">どこかで</span><span class="nb">人工的なものになるとも</span><span class="nb">思っています。</span><br><span class="nb">それでもなお、</span><span class="nb">心惹かれるのは</span><span class="nb">深い山に分け入ったときの</span><span class="nb">静けさ、</span><span class="nb">その静寂を破るように</span><span class="nb">轟音を上げて</span><span class="nb">流れ落ちる滝、</span><span class="nb">そして海に浮かび、</span><span class="nb">満ちては引いていく</span><span class="nb">波に感じる</span><span class="nb">大自然の息づかい。</span><br><span class="nb">そんな自然の中に</span><span class="nb">身を置いたときに感じる</span><span class="nb">安らぎや</span><span class="nb">美しさ</span><span class="nb">力強さ、</span><span class="nb">時には</span><span class="nb">恐ろしささえも</span><span class="nb">自分はとても好きで、</span><span class="nb">大切にしたいと</span><span class="nb">感じています。</span></p>
+      <p><span class="nb">お茶を育てるという</span><span class="nb">機会をいただいたからには、</span><span class="nb">その大自然が持つ</span><span class="nb">エッセンスが</span><span class="nb">出来るかぎり</span><span class="nb">そのまま残るような</span><span class="nb">お茶づくりを</span><span class="nb">してゆきたいと</span><span class="nb">思っています。</span></p>
     </div>
   </div>
 </section>
@@ -567,8 +593,8 @@
 <footer>
   <div class="footer-inner">
     <div>
-      <div class="fb"><img src="images/logo.png" alt="DOIT!FARM! ロゴ">DOIT!FARM!</div>
-      <p>〒619-1111 京都府木津川市加茂町山田西山田20 ／ お問い合わせ: info@example.com</p>
+      <div class="fb"><img src="images/logo.png" alt="DOIT!FARM! ロゴ"><span class="nb">DOIT!FARM!</span></div>
+      <p><span class="nb">〒619-1111</span> <span class="nb">京都府木津川市</span><span class="nb">加茂町山田西山田20</span> ／ <span class="nb">お問い合わせ:</span> <span class="nb">info@doitfarm.com</span></p>
     </div>
     <p>&copy; 2026 DOIT!FARM! ／ <a href="tokusho.html" style="color:inherit; text-decoration:underline;">特定商取引法に基づく表記</a></p>
   </div>
@@ -605,7 +631,7 @@
     <div id="card-pay-section">
       <div id="customer-form">
         <p class="cf-title">お届け先</p>
-        <p class="cf-lead">郵便番号を入れると住所が自動で入ります。ここで入力したお届け先で発送するので、次のお支払い画面では住所の入力は不要です。</p>
+        <p class="cf-lead"><span class="nb">郵便番号を入れると</span><span class="nb">住所が自動で入ります。</span><span class="nb">ここで入力した</span><span class="nb">お届け先で</span><span class="nb">発送するので、</span><span class="nb">次のお支払い画面では</span><span class="nb">住所の入力は</span><span class="nb">不要です。</span></p>
         <div class="cf-grid">
           <div class="cf-field">
             <label for="cf-lastName">姓</label>
@@ -652,7 +678,7 @@
     <div id="bank-pay-section" style="display:none;">
       <div class="bank-box">
         <p class="bank-box-title">お振込先</p>
-        <p>○○銀行 ○○支店<br>普通 1234567<br>口座名義: ドウイットファーム</p>
+        <p>GMOあおぞらネット銀行 ビジネス第二支店(202)<br>普通 1107638<br>口座名義: ドウーイツトフアーム フクヤ ケンジ</p>
         <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
         <p class="bank-note">送料込みの合計金額をお振込みください。お振込の際、可能であれば注文番号をお名前の前などにご記入ください。ご入金確認後、発送のご連絡をいたします。</p>
       </div>
@@ -687,8 +713,8 @@ const PRODUCTS = [
   { id:'tb_wakoucha', category:'ティーバッグ', kind:'和紅茶', name:'和紅茶', price:800, weight:'3g×8個入り', desc:'日本茶品種(やぶきた)で製茶した和紅茶。甘さ優位、渋さは少なく軽やかな飲み口。', color:'#A6532E', squareVariationId:'ZRVHMDRW2RIHK6YVZXQOUKML', labelName:'紅茶(ティーバッグ)', labelIngredients:'紅茶(京都府産)' },
   // 粉茶
   { id:'matcha_uji', category:'粉茶', kind:'抹茶', name:'宇治抹茶', price:2300, weight:'30g', desc:'一番茶の原料を伝統製法の石臼挽きでじっくり時間をかけて仕上げました。', color:'#4C7A3E', squareVariationId:'SHM2NM4EPLXGAT2NY2FQPUMM', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
-  { id:'matcha_kyoto', category:'粉茶', kind:'抹茶', name:'京都抹茶', price:1700, weight:'30g', desc:'宇治抹茶と同じ一番茶の原料を現代の微粉砕技術(ボールミル製法)で仕上げました。ラテやお菓子作り、もちろんお抹茶としても。幅広くご利用下さい。', color:'#6E9A4E', squareVariationId:'5KHQ4FFGIW2SXXC6GQMS63ZT', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
-  { id:'hojicha_powder',category:'粉茶', kind:'ほうじ茶', name:'ほうじ茶パウダー', price:1000, weight:'50g', desc:'深煎りほうじ茶を抹茶のように微粉末に仕上げました。ラテやお菓子作りなど自由にご利用下さい。', color:'#B8912E', squareVariationId:'BUE6TWFCF564AXLQ77OJZ4PR', labelName:'ほうじ茶(粉末)', labelIngredients:'ほうじ茶(京都府産)' },
+  { id:'matcha_kyoto', category:'粉茶', kind:'抹茶', name:'京都抹茶', price:1700, weight:'30g', desc:'宇治抹茶と同じ一番茶の原料を現代の微粉砕技術(ボールミル製法)で仕上げました。ラテやお菓子作り、もちろんお抹茶としても。幅広くご利用ください。', color:'#6E9A4E', squareVariationId:'5KHQ4FFGIW2SXXC6GQMS63ZT', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
+  { id:'hojicha_powder',category:'粉茶', kind:'ほうじ茶', name:'ほうじ茶パウダー', price:1000, weight:'50g', desc:'深煎りほうじ茶を抹茶のように微粉末に仕上げました。ラテやお菓子作りなど自由にご利用ください。', color:'#B8912E', squareVariationId:'BUE6TWFCF564AXLQ77OJZ4PR', labelName:'ほうじ茶(粉末)', labelIngredients:'ほうじ茶(京都府産)' },
 ];
 
 const CATEGORIES = ['茶葉', 'ティーバッグ', '粉茶'];
@@ -1081,7 +1107,7 @@ document.getElementById('bank-confirm-btn').addEventListener('click', () => {
   ];
   const subject = encodeURIComponent(`銀行振込でのご注文(注文番号: ${currentOrderNumber})`);
   const body = encodeURIComponent(bodyLines.join('\n'));
-  window.location.href = `mailto:info@example.com?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:info@doitfarm.com?subject=${subject}&body=${body}`;
 });
 
 // ---------------------------------------------------------------
