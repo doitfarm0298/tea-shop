@@ -93,6 +93,8 @@ export async function onRequestPost({ request, env }) {
     const amount = obj && obj.item_variation_data && obj.item_variation_data.price_money
       ? Number(obj.item_variation_data.price_money.amount) : null;
     if (amount === null) return json({ error: '取り扱いのない商品がカートに含まれています。ページを再読み込みしてください。' }, 400);
+    const isSoldOut = ((obj.item_variation_data.location_overrides) || []).some((o) => o.location_id === env.SQUARE_LOCATION_ID && o.sold_out);
+    if (isSoldOut) return json({ error: '品切れの商品がカートに含まれています。カートから削除してください。' }, 400);
     const q = Number(it.quantity);
     subtotal += amount * q;
     const label = String(it.name || '商品').slice(0, 60) + (it.weight ? `(${String(it.weight).slice(0, 30)})` : '');

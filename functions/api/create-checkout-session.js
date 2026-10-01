@@ -147,12 +147,17 @@ export async function onRequestPost({ request, env }) {
     }
 
     const priceById = {};
+    const soldOut = new Set();
     (catalogData.objects || []).forEach(obj => {
       const v = obj.item_variation_data;
       if (obj.type === 'ITEM_VARIATION' && v && v.price_money) {
         priceById[obj.id] = Number(v.price_money.amount);
+        if ((v.location_overrides || []).some(o => o.location_id === env.SQUARE_LOCATION_ID && o.sold_out)) soldOut.add(obj.id);
       }
     });
+    if (cleanItems.some(i => soldOut.has(i.variationId))) {
+      return json({ error: '品切れの商品がカートに含まれています。カートから削除してください。' }, 400);
+    }
 
     let subtotal = 0;
     for (const i of cleanItems) {
