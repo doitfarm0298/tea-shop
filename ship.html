@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>発送連絡 | DOIT!FARM! お店用</title>
+<link rel="icon" href="images/logo.png">
+<style>
+  :root{ --ink:#1D2B4A; --paper:#E8EFC8; --paper-dim:#C5D688; --clay:#B4462F; --muted:#5d6650; }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif; line-height:1.7;
+    word-break:auto-phrase;}
+  main{max-width:520px; margin:0 auto; padding:28px 18px 60px;}
+  h1{font-size:1.3rem; margin:0 0 4px;}
+  .lead{font-size:.85rem; color:var(--muted); margin:0 0 22px;}
+  label{display:block; font-size:.82rem; margin:14px 0 4px; font-weight:700;}
+  .opt{font-weight:400; color:var(--muted);}
+  input,select,textarea{width:100%; font:inherit; font-size:16px; padding:10px 12px;
+    border:1px solid rgba(0,0,0,.18); border-radius:4px; background:#F4F7E4; color:var(--ink);}
+  textarea{min-height:80px; resize:vertical;}
+  .row{display:flex; gap:10px; align-items:center; margin-top:10px; font-size:.85rem;}
+  .row input{width:auto;}
+  .btns{display:flex; gap:10px; margin-top:24px;}
+  button{flex:1; font:inherit; border:none; border-radius:999px; padding:12px 10px; cursor:pointer;}
+  .primary{background:var(--ink); color:var(--paper);}
+  .secondary{background:var(--paper-dim); color:var(--ink);}
+  button:disabled{opacity:.5; cursor:wait;}
+  #msg{margin-top:18px; padding:12px 14px; border-radius:4px; font-size:.9rem; display:none;}
+  #msg.ok{display:block; background:#d4e6b5;}
+  #msg.ng{display:block; background:#f3d6cc; color:#7a2414;}
+  .hint{font-size:.78rem; color:var(--muted); margin-top:4px;}
+  hr{border:none; border-top:1px solid rgba(0,0,0,.12); margin:24px 0 8px;}
+</style>
+</head>
+<body>
+<main>
+  <h1>発送連絡メール</h1>
+  <p class="lead">お店用のページです。入力して送ると、お客様に発送完了メール(追跡リンク付き)が届き、info@doitfarm.com にも控えが届きます。</p>
+
+  <label for="name">お客様のお名前</label>
+  <input id="name" placeholder="例: 福屋 健治" autocomplete="off">
+  <p class="hint">「様」は自動で付きます</p>
+
+  <label for="email">お客様のメールアドレス</label>
+  <input id="email" type="email" inputmode="email" autocomplete="off">
+
+  <label for="order">注文番号 <span class="opt">(任意)</span></label>
+  <input id="order" placeholder="例: DF34804366" autocomplete="off">
+
+  <label for="method">配送方法</label>
+  <select id="method">
+    <option>ゆうパック</option>
+    <option>ゆうパケット</option>
+    <option>クリックポスト</option>
+    <option>ゆうパケットポスト</option>
+  </select>
+
+  <label for="tracking">お問い合わせ番号(追跡番号)</label>
+  <input id="tracking" inputmode="numeric" placeholder="例: 1234-5678-9012" autocomplete="off">
+
+  <label for="note">ひとことメッセージ <span class="opt">(任意)</span></label>
+  <textarea id="note" placeholder="例: 新茶の時期のお茶をお入れしました。"></textarea>
+
+  <hr>
+  <label for="pw">パスワード</label>
+  <input id="pw" type="password" autocomplete="current-password">
+  <div class="row"><input id="remember" type="checkbox"><span>この端末にパスワードを保存する</span></div>
+
+  <div class="btns">
+    <button class="secondary" id="test">自分にテスト送信</button>
+    <button class="primary" id="send">お客様に送る</button>
+  </div>
+  <div id="msg"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+try { const saved = localStorage.getItem('ship-pw'); if (saved) { $('pw').value = saved; $('remember').checked = true; } } catch(e) {}
+
+async function send(test){
+  const msg = $('msg'); msg.className = ''; msg.textContent = '';
+  const body = {
+    name: $('name').value, email: $('email').value, orderNumber: $('order').value,
+    method: $('method').value, tracking: $('tracking').value, note: $('note').value,
+    password: $('pw').value, test
+  };
+  if (!test && !confirm(`${body.name} 様(${body.email})に発送メールを送ります。よろしいですか？`)) return;
+  try {
+    if ($('remember').checked) localStorage.setItem('ship-pw', body.password); else localStorage.removeItem('ship-pw');
+  } catch(e) {}
+  $('send').disabled = $('test').disabled = true;
+  try {
+    const res = await fetch('/api/ship-notify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    let data = {}; try { data = await res.json(); } catch(e) {}
+    if (!res.ok || !data.ok) throw new Error(data.error || '送信できませんでした');
+    msg.className = 'ok';
+    msg.textContent = test ? `テストメールを ${data.sentTo} に送りました。内容を確認してください。`
+                           : `${body.name} 様に発送メールを送りました。`;
+    if (!test) { ['name','email','order','tracking','note'].forEach(k => $(k).value = ''); }
+  } catch(e) {
+    msg.className = 'ng'; msg.textContent = 'エラー: ' + e.message;
+  } finally {
+    $('send').disabled = $('test').disabled = false;
+  }
+}
+$('test').addEventListener('click', () => send(true));
+$('send').addEventListener('click', () => send(false));
+</script>
+</body>
+</html>

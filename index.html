@@ -655,7 +655,7 @@
       <span class="amt" id="shipping-amt">¥0</span>
     </div>
     <div class="subtotal-row total-row">
-      <span>合計</span>
+      <span>合計<small style="font-weight:400; font-size:.75rem;">(税込)</small></span>
       <span class="amt" id="grand-total">¥0</span>
     </div>
     <p class="ship-note" id="free-ship-note"></p>
@@ -718,7 +718,7 @@
         <ol class="bank-steps">
           <li><span class="nb">上のお届け先を入力し、</span><span class="nb">「注文を確定する」を押します。</span></li>
           <li><span class="nb">ご注文内容とお振込先を</span><span class="nb">メールでお送りします。</span></li>
-          <li><span class="nb">下記の口座へ</span><span class="nb">送料込みの合計金額を</span><span class="nb">お振込みください。</span><span class="nb">振込名義の前に</span><span class="nb">注文番号を入れていただけると</span><span class="nb">確認がスムーズです。</span></li>
+          <li><span class="nb">下記の口座へ</span><span class="nb">送料込みの合計金額を</span><span class="nb">お振込みください。</span><span class="nb">ご注文者様と異なる名義の口座から</span><span class="nb">お振込みの場合は、</span><span class="nb">振込名義を</span><span class="nb">ご注文者様のお名前に</span><span class="nb">してください。</span></li>
           <li><span class="nb">ご入金を確認後、</span><span class="nb">発送してご連絡します。</span></li>
         </ol>
         <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
@@ -1007,12 +1007,15 @@ function validateCustomer(c){
   if(c.phone && !/^0\d{9,10}$/.test(phoneDigits)) bad.push('phone');
   const postalDigits = c.postal.replace(/\D/g, '');
   if(c.postal && !/^\d{7}$/.test(postalDigits)) bad.push('postal');
+  // 番地(数字)が入っているか。「番地なし」と書かれていればOK
+  if(c.address1 && !/[0-9０-９一二三四五六七八九十〇]|番地なし/.test(c.address1)) bad.push('address1');
 
   CF_FIELDS.forEach(k => document.getElementById('cf-' + k).classList.toggle('invalid', bad.includes(k)));
   if(bad.length === 0) return null;
   if(bad.includes('phone') && c.phone) return '電話番号は 0 から始まる10〜11桁で入力してください。';
   if(bad.includes('postal') && c.postal) return '郵便番号は7桁で入力してください。';
   if(bad.includes('email') && c.email) return 'メールアドレスの形式を確認してください。';
+  if(bad.includes('address1') && c.address1) return '町名・番地は、番地(数字)まで入力してください。';
   return '赤枠の項目を入力してください。';
 }
 
@@ -1160,7 +1163,7 @@ bankBtn.addEventListener('click', async () => {
     closeCart();
     showThanks(
       'ご注文を承りました',
-      `<p class="thanks-order">注文番号 <strong>${orderNo}</strong><br>お振込金額 <strong>${fmt(data.total)}</strong>(送料込み)</p>
+      `<p class="thanks-order">注文番号 <strong>${orderNo}</strong><br>お振込金額 <strong>${fmt(data.total)}</strong>(税込・送料込み)</p>
        <div class="thanks-bank">
          <span class="nb">GMOあおぞらネット銀行</span> <span class="nb">ビジネス第二支店(202)</span><br>
          普通 1107638<br>
