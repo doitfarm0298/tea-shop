@@ -698,6 +698,7 @@
           <label for="cf-pref">都道府県</label>
           <select id="cf-pref" autocomplete="address-level1"></select>
         </div>
+        <p id="postal-hint" class="addr-hint cf-field full" hidden></p>
         <div class="cf-field full">
           <label for="cf-city">市区町村</label>
           <input id="cf-city" autocomplete="address-level2">
@@ -984,7 +985,7 @@ function initCustomerForm(){
   });
   const postalEl = document.getElementById('cf-postal');
   ['input', 'change', 'blur'].forEach(ev => postalEl.addEventListener(ev, onPostalInput));
-  sel.addEventListener('change', renderCartDrawer);
+  sel.addEventListener('change', () => { document.getElementById('postal-hint').hidden = true; renderCartDrawer(); });
 }
 
 // ---------------------------------------------------------------
@@ -1014,6 +1015,21 @@ function onPostalInput(){
     }
     [pref, city, addr1].forEach(el => el.classList.remove('invalid'));
   });
+}
+// 郵便番号と都道府県が合っているか確認(郵便番号が見つからない場合は確認しない)
+async function postalPrefMismatch(c, errBox){
+  const digits = String(c.postal || '').replace(/\D/g, '');
+  if(digits.length !== 7) return false;
+  const r = await lookupPostal(digits);
+  if(!r || !r.pref || r.pref === c.pref){ document.getElementById('postal-hint').hidden = true; return false; }
+  const pref = document.getElementById('cf-pref');
+  const postal = document.getElementById('cf-postal');
+  pref.classList.add('invalid'); postal.classList.add('invalid');
+  const hint = document.getElementById('postal-hint');
+  hint.innerHTML = `<span class="nb">郵便番号(〒${digits.slice(0,3)}-${digits.slice(3)})は</span><span class="nb">${r.pref}の番号です。</span><span class="nb">郵便番号と都道府県を</span><span class="nb">ご確認ください。</span>`;
+  hint.hidden = false;
+  postal.scrollIntoView({ behavior:'smooth', block:'center' });
+  return true;
 }
 async function lookupPostal(zip){
   try{
@@ -1105,6 +1121,7 @@ checkoutBtn.addEventListener('click', async () => {
     if(firstBad) firstBad.focus();
     return;
   }
+  if(await postalPrefMismatch(customer, errBox)) return;
   if(needsAddressConfirm(customer, errBox)) return;
   saveCustomer(customer);
 
@@ -1186,6 +1203,7 @@ bankBtn.addEventListener('click', async () => {
     if(firstBad) firstBad.focus();
     return;
   }
+  if(await postalPrefMismatch(customer, errBox)) return;
   if(needsAddressConfirm(customer, errBox)) return;
   saveCustomer(customer);
   if(!currentOrderNumber){
