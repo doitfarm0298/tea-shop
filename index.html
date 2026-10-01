@@ -728,7 +728,7 @@
       <p class="ship-note"><span class="nb">確認メールが届かない場合は、</span><span class="nb">迷惑メールフォルダをご確認のうえ、</span><span class="nb">info@doitfarm.com まで</span><span class="nb">ご連絡ください。</span></p>
     </div>
 
-    <p class="ship-note">沖縄県・離島へのお届けは、確認のうえ追加送料についてご連絡する場合があります</p>
+    <p class="ship-note"><span class="nb">送料(税込)：</span><span class="nb">近畿・中国・四国・東海・北陸 1,000円／</span><span class="nb">関東・信越・九州 1,200円／</span><span class="nb">東北 1,400円／</span><span class="nb">北海道・沖縄 2,000円。</span><span class="nb">8,000円以上で送料無料</span><span class="nb">(北海道・沖縄は1,000円)。</span></p>
   </div>
 </div>
 
@@ -774,11 +774,22 @@ const leafSVG = (color) => `
 
 const fmt = (n) => '¥' + n.toLocaleString('ja-JP');
 
-// 送料設定: 全国一律900円、8,000円以上で送料無料
-// (api/create-checkout-session.js の値と揃えてください)
-const SHIPPING_FLAT = 900;
+// 送料設定(地域別)。functions/api の bank-order.js / create-checkout-session.js と同じ値にしてください
 const FREE_SHIPPING_MIN = 8000;
-const calcShipping = (subtotal) => subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
+const SHIP_ZONES = [
+  { fee:2000, free:1000, prefs:['北海道','沖縄県'] },
+  { fee:1400, free:0, prefs:['青森県','岩手県','宮城県','秋田県','山形県','福島県'] },
+  { fee:1200, free:0, prefs:['茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','山梨県','新潟県','長野県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県'] },
+];
+const SHIP_DEFAULT = { fee:1000, free:0 };
+const zoneFor = (pref) => SHIP_ZONES.find(z => z.prefs.includes(pref)) || SHIP_DEFAULT;
+// pref が空のときは null(未確定)を返す
+const calcShipping = (subtotal, pref) => {
+  if(!pref) return null;
+  const z = zoneFor(pref);
+  return subtotal >= FREE_SHIPPING_MIN ? z.free : z.fee;
+};
+const currentPref = () => { const el = document.getElementById('cf-pref'); return el ? el.value : ''; };
 
 // ---------------------------------------------------------------
 // カート状態 (localStorage に保存)
@@ -885,16 +896,25 @@ function renderCartDrawer(){
     `;
   }).join('');
 
-  const shipping = calcShipping(subtotal);
-  const grandTotal = subtotal + shipping;
+  const pref = currentPref();
+  const shipping = calcShipping(subtotal, pref);
   document.getElementById('subtotal').textContent = fmt(subtotal);
-  document.getElementById('shipping-amt').textContent = shipping === 0 ? '無料' : fmt(shipping);
-  document.getElementById('grand-total').textContent = fmt(grandTotal);
   const freeNote = document.getElementById('free-ship-note');
-  if(shipping > 0){
-    freeNote.textContent = `あと${fmt(FREE_SHIPPING_MIN - subtotal)}のご注文で送料無料`;
+  if(shipping === null){
+    const minFee = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIP_DEFAULT.fee;
+    document.getElementById('shipping-amt').textContent = minFee === 0 ? '無料〜' : fmt(minFee) + '〜';
+    document.getElementById('grand-total').textContent = fmt(subtotal + minFee) + '〜';
+    freeNote.textContent = subtotal >= FREE_SHIPPING_MIN
+      ? '送料無料です(北海道・沖縄は1,000円)'
+      : `送料はお届け先の都道府県で決まります。あと${fmt(FREE_SHIPPING_MIN - subtotal)}で送料無料(北海道・沖縄は1,000円)`;
   } else {
-    freeNote.textContent = '送料無料になりました';
+    document.getElementById('shipping-amt').textContent = shipping === 0 ? '無料' : fmt(shipping);
+    document.getElementById('grand-total').textContent = fmt(subtotal + shipping);
+    if(subtotal < FREE_SHIPPING_MIN){
+      freeNote.textContent = `${pref}への送料です。あと${fmt(FREE_SHIPPING_MIN - subtotal)}のご注文で送料${zoneFor(pref).free ? fmt(zoneFor(pref).free) : '無料'}`;
+    } else {
+      freeNote.textContent = shipping === 0 ? '送料無料になりました' : `送料割引が適用されました(${pref})`;
+    }
   }
 
   wrap.querySelectorAll('.cart-row').forEach(row=>{
@@ -952,6 +972,7 @@ function initCustomerForm(){
   });
   const postalEl = document.getElementById('cf-postal');
   ['input', 'change', 'blur'].forEach(ev => postalEl.addEventListener(ev, onPostalInput));
+  sel.addEventListener('change', renderCartDrawer);
 }
 
 // ---------------------------------------------------------------
@@ -972,6 +993,7 @@ function onPostalInput(){
     const city = document.getElementById('cf-city');
     const addr1 = document.getElementById('cf-address1');
     pref.value = r.pref;
+    renderCartDrawer();
     city.value = r.city;
     // まだ何も入っていないか、前回の自動入力のままなら町名を入れる
     if(!addr1.value || addr1.value === autoFilledAddress1){
