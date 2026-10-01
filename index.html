@@ -914,10 +914,10 @@ function renderCartDrawer(){
   const freeNote = document.getElementById('free-ship-note');
   if(shipping === null){
     const minFee = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIP_DEFAULT.fee;
-    document.getElementById('shipping-amt').textContent = minFee === 0 ? '無料〜' : fmt(minFee) + '〜';
-    document.getElementById('grand-total').textContent = fmt(subtotal + minFee) + '〜';
+    document.getElementById('shipping-amt').textContent = minFee === 0 ? '無料※' : fmt(minFee) + '〜';
+    document.getElementById('grand-total').textContent = minFee === 0 ? fmt(subtotal) : fmt(subtotal + minFee) + '〜';
     freeNote.textContent = subtotal >= FREE_SHIPPING_MIN
-      ? '送料無料です(北海道・沖縄は1,000円)'
+      ? '送料無料です(※北海道・沖縄は送料1,000円)'
       : `送料はお届け先の都道府県で決まります。あと${fmt(FREE_SHIPPING_MIN - subtotal)}で送料無料(北海道・沖縄は1,000円)`;
   } else {
     document.getElementById('shipping-amt').textContent = shipping === 0 ? '無料' : fmt(shipping);
