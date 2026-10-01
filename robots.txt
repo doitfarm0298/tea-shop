@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /ship.html
+Disallow: /api/
+
+Sitemap: https://doitfarm.com/sitemap.xml
