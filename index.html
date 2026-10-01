@@ -540,6 +540,7 @@
   #customer-form.open{display:block;}
   .cf-title{font-weight:700; font-size:.92rem; margin:0 0 4px;}
   .cf-lead{font-size:.74rem; color:var(--muted-dark); margin:0 0 12px;}
+  .addr-hint{font-size:.74rem; line-height:1.6; color:var(--clay); margin:6px 0 0;}
   .cf-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .cf-grid .full{grid-column:1 / -1;}
   .cf-field label{display:block; font-size:.74rem; color:var(--muted-dark); margin-bottom:3px;}
@@ -704,6 +705,7 @@
         <div class="cf-field full">
           <label for="cf-address1">町名・番地(番地まで入力してください)</label>
           <input id="cf-address1" autocomplete="address-line1">
+          <p id="addr-hint" class="addr-hint" hidden><span class="nb">番地が入っていないようです。</span><span class="nb">番地まで入力してください。</span><br><span class="nb">番地のないご住所の場合は、</span><span class="nb">もう一度ボタンを押すと</span><span class="nb">そのまま進めます。</span></p>
         </div>
         <div class="cf-field full">
           <label for="cf-address2">建物名・部屋番号 <span class="opt">(任意)</span></label>
@@ -1036,14 +1038,17 @@ function readCustomer(){
 let addressConfirmedFor = '';
 function needsAddressConfirm(c, errBox){
   const addr = `${c.address1 || ''} ${c.address2 || ''}`;
-  if(/[0-9０-９]/.test(addr) || addressConfirmedFor === addr) return false;
+  if(/[0-9０-９]/.test(addr) || addressConfirmedFor === addr){
+    document.getElementById('addr-hint').hidden = true;
+    return false;
+  }
   addressConfirmedFor = addr;
   const el = document.getElementById('cf-address1');
   el.classList.add('invalid');
-  errBox.textContent = '番地が入っていないようです。番地まで入力してください。番地のないご住所の場合は、もう一度ボタンを押すとそのまま進めます。';
-  errBox.style.display = 'block';
-  errBox.scrollIntoView({ behavior:'smooth', block:'center' });
-  el.focus();
+  const hint = document.getElementById('addr-hint');
+  hint.hidden = false;
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  el.focus({ preventScroll:true });
   return true;
 }
 
@@ -1052,7 +1057,7 @@ function validateCustomer(c){
   CF_REQUIRED.forEach(k => { if(!c[k]) bad.push(k); });
   if(c.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) bad.push('email');
   const phoneDigits = c.phone.replace(/\D/g, '');
-  if(c.phone && !/^0\d{9,10}$/.test(phoneDigits)) bad.push('phone');
+  if(c.phone && !/^0[1-9]\d{8,9}$/.test(phoneDigits)) bad.push('phone');
   const postalDigits = c.postal.replace(/\D/g, '');
   if(c.postal && !/^\d{7}$/.test(postalDigits)) bad.push('postal');
 
