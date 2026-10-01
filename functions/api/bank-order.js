@@ -121,7 +121,7 @@ export async function onRequestPost({ request, env }) {
     'ご不明な点は、このメールにご返信ください。',
     '',
     '--',
-    'DOIT!FARM! 自然栽培の宇治茶',
+    'DOIT!FARM!',
     '京都府木津川市加茂町山田西山田20',
     'https://doitfarm.com',
     SHOP_EMAIL,
