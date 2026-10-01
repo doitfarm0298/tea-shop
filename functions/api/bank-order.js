@@ -6,8 +6,18 @@
 
 const SHOP_EMAIL = 'info@doitfarm.com';
 const FROM = 'DOIT!FARM! <info@doitfarm.com>';
-const SHIPPING_FLAT = 900;
+// 送料(地域別)。index.html と同じ値にしてください
 const FREE_SHIPPING_MIN = 8000;
+const SHIP_ZONES = [
+  { fee: 2000, free: 1000, prefs: ['北海道', '沖縄県'] },
+  { fee: 1400, free: 0, prefs: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] },
+  { fee: 1200, free: 0, prefs: ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '山梨県', '新潟県', '長野県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県'] },
+];
+const SHIP_DEFAULT = { fee: 1000, free: 0 };
+const calcShipping = (subtotal, pref) => {
+  const z = SHIP_ZONES.find((x) => x.prefs.includes(pref)) || SHIP_DEFAULT;
+  return subtotal >= FREE_SHIPPING_MIN ? z.free : z.fee;
+};
 const BANK_TEXT = [
   'GMOあおぞらネット銀行 ビジネス第二支店(202)',
   '普通 1107638',
@@ -73,7 +83,7 @@ export async function onRequestPost({ request, env }) {
     const label = String(it.name || '商品').slice(0, 60) + (it.weight ? `(${String(it.weight).slice(0, 30)})` : '');
     lines.push(`・${label} × ${q}  ${yen(amount * q)}`);
   }
-  const shipping = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
+  const shipping = calcShipping(subtotal, c.pref);
   const total = subtotal + shipping;
 
   const zip7 = String(c.postal).replace(/\D/g, '');
@@ -117,7 +127,6 @@ export async function onRequestPost({ request, env }) {
     `振込名義をご注文者様のお名前(${c.lastName} ${c.firstName} 様)にしてください。`,
     'ご入金を確認後、発送してあらためてご連絡いたします。',
     '',
-    '沖縄県・離島へのお届けの場合、追加送料についてご連絡することがあります。',
     'ご不明な点は、このメールにご返信ください。',
     '',
     '--',

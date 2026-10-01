@@ -22,10 +22,19 @@ const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
 
 const SQUARE_VERSION = '2025-01-23';
 
-// 送料の設定
-// index.html の SHIPPING_FLAT / FREE_SHIPPING_MIN と同じ値にしてください。
-const SHIPPING_FLAT = 900;       // 通常の送料(円)
+// 送料の設定(地域別)
+// index.html と bank-order.js の送料設定と同じ値にしてください。
 const FREE_SHIPPING_MIN = 8000;  // この金額(商品合計)以上で送料無料(円)
+const SHIP_ZONES = [
+  { fee: 2000, free: 1000, prefs: ['北海道', '沖縄県'] },
+  { fee: 1400, free: 0, prefs: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] },
+  { fee: 1200, free: 0, prefs: ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '山梨県', '新潟県', '長野県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県'] },
+];
+const SHIP_DEFAULT = { fee: 1000, free: 0 };  // 近畿・中国・四国・東海・北陸
+const calcShipping = (subtotal, pref) => {
+  const z = SHIP_ZONES.find((x) => x.prefs.includes(pref)) || SHIP_DEFAULT;
+  return subtotal >= FREE_SHIPPING_MIN ? z.free : z.fee;
+};
 
 function squareHeaders(env) {
   return {
@@ -136,7 +145,8 @@ export async function onRequestPost({ request, env }) {
       subtotal += priceById[i.variationId] * i.quantity;
     }
 
-    const shippingAmount = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FLAT;
+    // お届け先の都道府県で送料を決めます
+    const shippingAmount = calcShipping(subtotal, c.pref);
 
     const line_items = cleanItems.map(i => ({
       quantity: String(i.quantity),
@@ -282,4 +292,4 @@ export async function onRequestPost({ request, env }) {
     console.error(err);
     return json({ error: err.message || '決済セッションの作成に失敗しました' }, 500);
   }
-      }
+}
