@@ -1031,6 +1031,22 @@ function readCustomer(){
   return c;
 }
 // 問題がなければ null、あれば案内文を返します
+// 番地(数字)が見当たらないときは一度だけ確認する。
+// 番地のない地域もあるので、もう一度押せばそのまま進めます。
+let addressConfirmedFor = '';
+function needsAddressConfirm(c, errBox){
+  const addr = `${c.address1 || ''} ${c.address2 || ''}`;
+  if(/[0-9０-９]/.test(addr) || addressConfirmedFor === addr) return false;
+  addressConfirmedFor = addr;
+  const el = document.getElementById('cf-address1');
+  el.classList.add('invalid');
+  errBox.textContent = '番地が入っていないようです。番地まで入力してください。番地のないご住所の場合は、もう一度ボタンを押すとそのまま進めます。';
+  errBox.style.display = 'block';
+  errBox.scrollIntoView({ behavior:'smooth', block:'center' });
+  el.focus();
+  return true;
+}
+
 function validateCustomer(c){
   const bad = [];
   CF_REQUIRED.forEach(k => { if(!c[k]) bad.push(k); });
@@ -1039,15 +1055,12 @@ function validateCustomer(c){
   if(c.phone && !/^0\d{9,10}$/.test(phoneDigits)) bad.push('phone');
   const postalDigits = c.postal.replace(/\D/g, '');
   if(c.postal && !/^\d{7}$/.test(postalDigits)) bad.push('postal');
-  // 番地(数字)が入っているか。「番地なし」と書かれていればOK
-  if(c.address1 && !/[0-9０-９一二三四五六七八九十〇]|番地なし/.test(c.address1)) bad.push('address1');
 
   CF_FIELDS.forEach(k => document.getElementById('cf-' + k).classList.toggle('invalid', bad.includes(k)));
   if(bad.length === 0) return null;
   if(bad.includes('phone') && c.phone) return '電話番号は 0 から始まる10〜11桁で入力してください。';
   if(bad.includes('postal') && c.postal) return '郵便番号は7桁で入力してください。';
   if(bad.includes('email') && c.email) return 'メールアドレスの形式を確認してください。';
-  if(bad.includes('address1') && c.address1) return '町名・番地は、番地(数字)まで入力してください。';
   return '赤枠の項目を入力してください。';
 }
 
@@ -1087,6 +1100,7 @@ checkoutBtn.addEventListener('click', async () => {
     if(firstBad) firstBad.focus();
     return;
   }
+  if(needsAddressConfirm(customer, errBox)) return;
   saveCustomer(customer);
 
   checkoutBtn.disabled = true;
@@ -1167,6 +1181,7 @@ bankBtn.addEventListener('click', async () => {
     if(firstBad) firstBad.focus();
     return;
   }
+  if(needsAddressConfirm(customer, errBox)) return;
   saveCustomer(customer);
   if(!currentOrderNumber){
     currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
