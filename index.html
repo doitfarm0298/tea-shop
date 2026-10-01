@@ -789,7 +789,12 @@ const calcShipping = (subtotal, pref) => {
   const z = zoneFor(pref);
   return subtotal >= FREE_SHIPPING_MIN ? z.free : z.fee;
 };
-const currentPref = () => { const el = document.getElementById('cf-pref'); return el ? el.value : ''; };
+// お届け先フォームを開くまでは、保存済みの住所があっても送料は「〜」表示にします
+const currentPref = () => {
+  const form = document.getElementById('customer-form');
+  const el = document.getElementById('cf-pref');
+  return (form && form.classList.contains('open') && el) ? el.value : '';
+};
 
 // ---------------------------------------------------------------
 // カート状態 (localStorage に保存)
@@ -1063,6 +1068,7 @@ checkoutBtn.addEventListener('click', async () => {
     customerForm.classList.add('open');
     checkoutBtn.textContent = 'お支払いへ進む';
     onPostalInput();
+    renderCartDrawer();
     customerForm.scrollIntoView({ behavior:'smooth', block:'start' });
     return;
   }
@@ -1123,6 +1129,7 @@ document.querySelectorAll('.pay-method-btn').forEach(btn=>{
         customerForm.classList.add('open');
         checkoutBtn.textContent = 'お支払いへ進む';
         onPostalInput();
+        renderCartDrawer();
       }
       if(!currentOrderNumber){
         currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
