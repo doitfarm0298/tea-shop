@@ -89,7 +89,8 @@ export async function onRequestPost({ request, env }) {
     '',
     `小計: ${yen(subtotal)}`,
     `送料: ${shipping === 0 ? '無料' : yen(shipping)}`,
-    `合計: ${yen(total)}`,
+    `合計: ${yen(total)}(税込)`,
+    '※価格はすべて税込です',
     '',
     '【お届け先】',
     name + ' 様',
@@ -109,11 +110,11 @@ export async function onRequestPost({ request, env }) {
     '【お振込先】',
     BANK_TEXT,
     '',
-    `お振込金額: ${yen(total)}(送料込み)`,
+    `お振込金額: ${yen(total)}(税込・送料込み)`,
     '━━━━━━━━━━━━━━',
     '',
-    '振込名義の前に注文番号を入れていただけると、確認がスムーズです。',
-    `(例: ${orderNumber} ${c.lastName}${c.firstName})`,
+    'ご注文者様と異なる名義の口座からお振込みの場合は、',
+    `振込名義をご注文者様のお名前(${c.lastName} ${c.firstName} 様)にしてください。`,
     'ご入金を確認後、発送してあらためてご連絡いたします。',
     '',
     '沖縄県・離島へのお届けの場合、追加送料についてご連絡することがあります。',
@@ -132,7 +133,7 @@ export async function onRequestPost({ request, env }) {
     orderBlock,
     `メール: ${c.email}`,
     '',
-    `入金予定額: ${yen(total)}`,
+    `入金予定額: ${yen(total)}(税込)`,
   ].join('\n');
 
   const send = (payload) => fetch('https://api.resend.com/emails', {
@@ -157,4 +158,4 @@ export async function onRequestPost({ request, env }) {
   });
 
   return json({ ok: true, orderNumber, subtotal, shipping, total, customerMailSent: custRes.ok });
-        }
+}
