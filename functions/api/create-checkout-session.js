@@ -78,6 +78,20 @@ function normalizeCustomer(c) {
   return n;
 }
 
+// 郵便番号と都道府県が合っているか(調べられないときは通す)
+async function prefMatchesPostal(postal, pref) {
+  const digits = String(postal || '').replace(/\D/g, '');
+  if (digits.length !== 7) return true;
+  try {
+    const res = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + digits);
+    const data = await res.json();
+    const r = data && Array.isArray(data.results) ? data.results[0] : null;
+    return !r || !r.address1 || r.address1 === pref;
+  } catch (e) {
+    return true;
+  }
+}
+
 export async function onRequestPost({ request, env }) {
   const SQUARE_API_BASE = env.SQUARE_ENV === 'sandbox'
     ? 'https://connect.squareupsandbox.com'
@@ -95,6 +109,9 @@ export async function onRequestPost({ request, env }) {
     const c = normalizeCustomer(customer);
     if (!c) {
       return json({ error: 'お届け先の入力内容を確認してください' }, 400);
+    }
+    if (!(await prefMatchesPostal(c.postal, c.pref))) {
+      return json({ error: '郵便番号と都道府県が一致しません。ご確認ください。' }, 400);
     }
 
     // 受け取った内容を整えてチェック

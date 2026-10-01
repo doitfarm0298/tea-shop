@@ -28,6 +28,20 @@ const yen = (n) => '¥' + Number(n).toLocaleString('ja-JP');
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 
+// 郵便番号と都道府県が合っているか(調べられないときは通す)
+async function prefMatchesPostal(postal, pref) {
+  const digits = String(postal || '').replace(/\D/g, '');
+  if (digits.length !== 7) return true;
+  try {
+    const res = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + digits);
+    const data = await res.json();
+    const r = data && Array.isArray(data.results) ? data.results[0] : null;
+    return !r || !r.address1 || r.address1 === pref;
+  } catch (e) {
+    return true;
+  }
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.RESEND_API_KEY || !env.SQUARE_ACCESS_TOKEN) {
     return json({ error: 'メール送信の設定が完了していません' }, 500);
@@ -45,6 +59,7 @@ export async function onRequestPost({ request, env }) {
   if (required.some((k) => !String(c[k] || '').trim())) return json({ error: 'お届け先に未入力の項目があります' }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) return json({ error: 'メールアドレスの形式が正しくありません' }, 400);
   if (!orderNumber) return json({ error: '注文番号がありません' }, 400);
+  if (!(await prefMatchesPostal(c.postal, c.pref))) return json({ error: '郵便番号と都道府県が一致しません。ご確認ください。' }, 400);
   if (items.length === 0) return json({ error: 'カートが空です' }, 400);
   for (const it of items) {
     const q = Number(it.quantity);
