@@ -324,6 +324,10 @@
     background:var(--paper-dim);
   }
   .card-art svg{width:56%;height:56%;}
+  @media (max-width:600px){
+    .card-art{aspect-ratio:2/1;}
+    .card-art svg{height:72%;}
+  }
   .card.sold-out .card-art svg{opacity:.35;}
   .card.sold-out h3, .card.sold-out .desc, .card.sold-out .price{opacity:.5;}
   .sold-out-badge{
@@ -606,8 +610,8 @@
       <h2>つくり手について</h2>
     </div>
     <div class="about-text">
-      <p><span class="nb">2012年に</span><span class="nb">季節労働という形で</span><span class="nb">お茶仕事と出会い、</span><br><span class="nb">宇治茶の主産地でもある</span><span class="nb">京都の加茂町で、</span><span class="nb">2021年より</span><span class="nb">仲間たちの協力のもと</span><span class="nb">自身のお茶作りを</span><span class="nb">始めました。</span></p>
-      <p><span class="nb">高齢になった</span><span class="nb">お茶農家さんが</span><span class="nb">茶畑を手放し、</span><span class="nb">荒れ始めた畑を借りて</span><span class="nb">コツコツと整備し直して</span><span class="nb">お茶作りをしています。</span></p>
+      <p><span class="nb">2012年に</span><span class="nb">季節労働という形で</span><span class="nb">お茶仕事と出会い、</span><br><span class="nb">宇治茶の主産地でもある</span><span class="nb">京都の加茂町で、</span><span class="nb">2021年より</span><span class="nb">仲間たちの協力のもと</span><span class="nb">自身のお茶づくりを</span><span class="nb">始めました。</span></p>
+      <p><span class="nb">高齢になった</span><span class="nb">お茶農家さんが</span><span class="nb">茶畑を手放し、</span><span class="nb">荒れ始めた畑を借りて</span><span class="nb">コツコツと整備し直して</span><span class="nb">お茶づくりをしています。</span></p>
       <p><span class="nb">自然栽培とはいえ</span><span class="nb">人の手が入る以上、</span><span class="nb">完全な自然ではなく、</span><br><span class="nb">どこかで</span><span class="nb">人工的なものになるとも</span><span class="nb">思っています。</span><br><span class="nb">それでもなお、</span><span class="nb">心惹かれるのは</span><span class="nb">深い山に分け入ったときの</span><span class="nb">静けさ、</span><span class="nb">その静寂を破るように</span><span class="nb">轟音を上げて</span><span class="nb">流れ落ちる滝、</span><span class="nb">そして海に浮かび、</span><span class="nb">満ちては引いていく</span><span class="nb">波に感じる</span><span class="nb">大自然の息づかい。</span><br><span class="nb">そんな自然の中に</span><span class="nb">身を置いたときに感じる</span><span class="nb">安らぎや</span><span class="nb">美しさ</span><span class="nb">力強さ、</span><span class="nb">時には</span><span class="nb">恐ろしささえも</span><span class="nb">自分はとても好きで、</span><span class="nb">大切にしたいと</span><span class="nb">感じています。</span></p>
       <p><span class="nb">お茶を育てるという</span><span class="nb">機会をいただいたからには、</span><span class="nb">その大自然が持つ</span><span class="nb">エッセンスが</span><span class="nb">出来るかぎり</span><span class="nb">そのまま残るような</span><span class="nb">お茶づくりを</span><span class="nb">してゆきたいと</span><span class="nb">思っています。</span></p>
     </div>
@@ -623,7 +627,7 @@
   <div class="footer-inner">
     <div>
       <div class="fb"><img src="images/logo.png" alt="DOIT!FARM! ロゴ"><span class="nb">DOIT!FARM!</span></div>
-      <p><span class="nb">〒619-1111</span> <span class="nb">京都府木津川市</span><span class="nb">加茂町山田西山田20</span> ／ <span class="nb">お問い合わせ:</span> <span class="nb">info@doitfarm.com</span></p>
+      <p><span class="nb">〒619-1111</span> <span class="nb">京都府木津川市</span><span class="nb">加茂町山田西山田20</span> ／ <span class="nb">お問い合わせ:</span> <span class="nb"><a href="mailto:info@doitfarm.com" style="color:inherit;">info@doitfarm.com</a></span></p>
     </div>
     <p>&copy; 2026 DOIT!FARM! ／ <a href="tokusho.html" style="color:inherit; text-decoration:underline;">特定商取引法に基づく表記</a></p>
   </div>
@@ -633,7 +637,7 @@
   <div class="thanks-box">
     <img src="images/logo.png" alt="">
     <h2 id="thanks-title"><span class="nb">ご注文</span><span class="nb">ありがとうございました</span></h2>
-    <div id="thanks-body"><p><span class="nb">発送の準備ができ次第、</span><span class="nb">メールでご連絡いたします。</span><br><span class="nb">お茶の到着まで、</span><span class="nb">今しばらくお待ちください。</span></p></div>
+    <div id="thanks-body"><p><span class="nb">決済完了のお知らせ(領収書)は、</span><span class="nb">Squareからメールで届きます。</span><br><span class="nb">商品は通常2〜3営業日以内に発送し、</span><span class="nb">発送時に追跡番号を</span><span class="nb">メールでお知らせします。</span></p></div>
     <button type="button" id="thanks-close">閉じる</button>
   </div>
 </div>
@@ -719,8 +723,9 @@
           <li><span class="nb">上のお届け先を入力し、</span><span class="nb">「注文を確定する」を押します。</span></li>
           <li><span class="nb">ご注文内容とお振込先を</span><span class="nb">メールでお送りします。</span></li>
           <li><span class="nb">下記の口座へ</span><span class="nb">送料込みの合計金額を</span><span class="nb">お振込みください。</span><span class="nb">ご注文者様と異なる名義の口座から</span><span class="nb">お振込みの場合は、</span><span class="nb">振込名義を</span><span class="nb">ご注文者様のお名前に</span><span class="nb">してください。</span></li>
-          <li><span class="nb">ご入金を確認後、</span><span class="nb">発送してご連絡します。</span></li>
+          <li><span class="nb">ご入金を確認後、</span><span class="nb">通常2〜3営業日以内に発送し、</span><span class="nb">追跡番号をお知らせします。</span></li>
         </ol>
+        <p class="ship-note" style="text-align:left; margin:0 0 10px;"><span class="nb">※振込手数料は</span><span class="nb">お客様のご負担となります。</span><span class="nb">お振込みはご注文から7日以内に</span><span class="nb">お願いいたします。</span></p>
         <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
         <p class="bank-account"><span class="nb">GMOあおぞらネット銀行</span> <span class="nb">ビジネス第二支店(202)</span><br>普通 1107638<br>口座名義: <span class="nb">ドウーイツトフアーム</span> <span class="nb">フクヤ ケンジ</span></p>
       </div>
@@ -742,21 +747,21 @@
 const PRODUCTS = [
   // 茶葉
   { id:'kabusecha', category:'茶葉', kind:'かぶせ煎茶', name:'かぶせ煎茶', price:1350, weight:'65g', desc:'収穫前に覆いをかぶせ、旨味を引き出しました。香りも楽しめるよう浅蒸しで仕上げてあります。', color:'#5C7A52', squareVariationId:'XBJ7AKOCPQFVMKZODI7RUNO5', labelName:'緑茶', labelIngredients:'緑茶(京都府産)' },
-  { id:'genmaicha', category:'茶葉', kind:'玄米茶', name:'玄米茶', price:1350, weight:'130g', desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'UFLZSMLTOZKFOCDA34LOZKA3', labelName:'緑茶(玄米茶)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)' },
+  { id:'genmaicha', category:'茶葉', kind:'玄米茶', name:'玄米茶', price:1350, weight:'130g', desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'UFLZSMLTOZKFOCDA34LOZKA3', labelName:'緑茶(玄米茶)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)', labelCultivation:'緑茶:自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)<br>玄米:栽培期間中農薬不使用' },
   { id:'hojicha_fukairi', category:'茶葉', kind:'ほうじ茶', name:'深煎りほうじ茶', price:800, weight:'100g', desc:'大きく育てた一番茶の茶葉をしっかりと焙煎し香ばしく仕上げてあります。', color:'#9C6B33', squareVariationId:'2EUCCKZUEUFYM6TMJZG4GOXI', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
   { id:'hojicha_fukairi_500', category:'茶葉', kind:'ほうじ茶(大容量)', name:'深煎りほうじ茶(大容量)', price:3500, weight:'500g', desc:'たっぷり楽しみたい方向けの大容量サイズ。', color:'#8A5A2A', squareVariationId:'B6FE47PZFMYIVO4OTBBCWNEN', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
   { id:'hojicha_asairi', category:'茶葉', kind:'ほうじ茶', name:'浅煎りほうじ茶', price:800, weight:'90g', desc:'浅めに焙煎することで、ほうじ茶の香ばしさと緑茶の爽やかさの両方を楽しめます。', color:'#B98A4A', squareVariationId:'BMQVGEDJCDZI5PTIMZLILGEE', labelName:'ほうじ茶', labelIngredients:'緑茶(京都府産)' },
   { id:'wakoucha', category:'茶葉', kind:'和紅茶', name:'和紅茶', price:800, weight:'50g', desc:'日本茶品種(やぶきた)で製茶した和紅茶。甘さ優位、渋さは少なく軽やかな飲み口。', color:'#A6532E', squareVariationId:'PT4PB7LA7XMPX7K4LRNB4L7S', labelName:'紅茶', labelIngredients:'紅茶(京都府産)' },
   // ティーバッグ
   { id:'tb_kabusecha', category:'ティーバッグ', kind:'かぶせ煎茶', name:'かぶせ煎茶', price:900, weight:'3g×8個入り', desc:'収穫前に覆いをかぶせ、旨味を引き出しました。香りも楽しめるよう浅蒸しで仕上げてあります。', color:'#5C7A52', squareVariationId:'I22YB54IFNUEWAVHSO4LQ3T2', labelName:'緑茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
-  { id:'tb_genmaicha', category:'ティーバッグ', kind:'玄米茶', name:'玄米茶', price:900, weight:'3g×8個入り', desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'ZVFQUDETNMR5JCZXGADQNLFK', soldOut:true, labelName:'緑茶(玄米茶・ティーバッグ)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)' },
+  { id:'tb_genmaicha', category:'ティーバッグ', kind:'玄米茶', name:'玄米茶', price:900, weight:'3g×8個入り', desc:'煎茶と愛媛県産ヒノヒカリ(栽培期間中農薬不使用)、ほのかな渋みと香ばしさの贅沢な調和。', color:'#B8912E', squareVariationId:'ZVFQUDETNMR5JCZXGADQNLFK', soldOut:true, labelName:'緑茶(玄米茶・ティーバッグ)', labelIngredients:'緑茶(京都府産)、玄米(愛媛県産ヒノヒカリ、栽培期間中農薬不使用)', labelCultivation:'緑茶:自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)<br>玄米:栽培期間中農薬不使用' },
   { id:'tb_fukairi', category:'ティーバッグ', kind:'ほうじ茶', name:'深煎りほうじ茶', price:800, weight:'3g×8個入り', desc:'大きく育てた一番茶の茶葉をしっかりと焙煎し香ばしく仕上げてあります。', color:'#9C6B33', squareVariationId:'EC5DM3LUZYIQUT5H2OEFSSU6', labelName:'ほうじ茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
   { id:'tb_asairi', category:'ティーバッグ', kind:'ほうじ茶', name:'浅煎りほうじ茶', price:800, weight:'3g×8個入り', desc:'浅めに焙煎することで、ほうじ茶の香ばしさと緑茶の爽やかさの両方を楽しめます。', color:'#B98A4A', squareVariationId:'4NN4ZWD7LTCQ6DLQFHV4EI7B', labelName:'ほうじ茶(ティーバッグ)', labelIngredients:'緑茶(京都府産)' },
   { id:'tb_wakoucha', category:'ティーバッグ', kind:'和紅茶', name:'和紅茶', price:800, weight:'3g×8個入り', desc:'日本茶品種(やぶきた)で製茶した和紅茶。甘さ優位、渋さは少なく軽やかな飲み口。', color:'#A6532E', squareVariationId:'ZRVHMDRW2RIHK6YVZXQOUKML', labelName:'紅茶(ティーバッグ)', labelIngredients:'紅茶(京都府産)' },
   // 粉茶
   { id:'matcha_uji', category:'粉茶', kind:'抹茶', name:'宇治抹茶', price:2300, weight:'30g', desc:'一番茶の原料を伝統製法の石臼挽きでじっくり時間をかけて仕上げました。', color:'#4C7A3E', squareVariationId:'SHM2NM4EPLXGAT2NY2FQPUMM', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
   { id:'matcha_kyoto', category:'粉茶', kind:'抹茶', name:'京都抹茶', price:1700, weight:'30g', desc:'宇治抹茶と同じ一番茶の原料を現代の微粉砕技術(ボールミル製法)で仕上げました。ラテやお菓子作り、もちろんお抹茶としても。幅広くご利用ください。', color:'#6E9A4E', squareVariationId:'5KHQ4FFGIW2SXXC6GQMS63ZT', labelName:'抹茶', labelIngredients:'抹茶(京都府産)' },
-  { id:'hojicha_powder',category:'粉茶', kind:'ほうじ茶', name:'ほうじ茶パウダー', price:1000, weight:'50g', desc:'深煎りほうじ茶を抹茶のように微粉末に仕上げました。ラテやお菓子作りなど自由にご利用ください。', color:'#B8912E', squareVariationId:'BUE6TWFCF564AXLQ77OJZ4PR', labelName:'ほうじ茶(粉末)', labelIngredients:'ほうじ茶(京都府産)' },
+  { id:'hojicha_powder',category:'粉茶', kind:'ほうじ茶', name:'ほうじ茶パウダー', price:1000, weight:'50g', desc:'深煎りほうじ茶を抹茶のように微粉末に仕上げました。ラテやお菓子作りなど自由にご利用ください。', color:'#B8912E', squareVariationId:'BUE6TWFCF564AXLQ77OJZ4PR', labelName:'ほうじ茶(粉末)', labelIngredients:'緑茶(京都府産)' },
 ];
 
 const CATEGORIES = ['茶葉', 'ティーバッグ', '粉茶'];
@@ -840,7 +845,7 @@ function renderProducts(){
                 <dl>
                   <dt>名称</dt><dd>${p.labelName}</dd>
                   <dt>原材料名</dt><dd>${p.labelIngredients}</dd>
-                  <dt>栽培方法</dt><dd>自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)</dd>
+                  <dt>栽培方法</dt><dd>${p.labelCultivation || '自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)'}</dd>
                   <dt>内容量</dt><dd>${p.weight}</dd>
                   <dt>賞味期限</dt><dd>商品パッケージに記載</dd>
                   <dt>保存方法</dt><dd>直射日光・高温多湿を避け、常温で保存してください</dd>
@@ -1201,7 +1206,7 @@ bankBtn.addEventListener('click', async () => {
        <p>${data.customerMailSent
          ? '<span class="nb">ご注文内容とお振込先を</span><span class="nb">メールでお送りしました。</span>'
          : '<span class="nb">確認メールを送れませんでした。</span><span class="nb">この画面を保存してください。</span>'}<br>
-       <span class="nb">ご入金を確認後、</span><span class="nb">発送してご連絡いたします。</span></p>`
+       <span class="nb">ご入金を確認後、</span><span class="nb">通常2〜3営業日以内に発送し、</span><span class="nb">追跡番号をお知らせします。</span></p>`
     );
   } catch(e){
     errBox.textContent = 'エラー: ' + e.message + '。時間をおいてもう一度お試しいただくか、info@doitfarm.com までご連絡ください。';
