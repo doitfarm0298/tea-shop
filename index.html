@@ -398,6 +398,26 @@
   .footer-inner p{color:var(--muted-dark); font-size:.82rem; margin:0;}
 
   /* ---------- cart drawer ---------- */
+  .thanks{
+    position:fixed; inset:0; z-index:90;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px; background:rgba(20,30,20,.55);
+  }
+  .thanks[hidden]{display:none;}
+  .thanks-box{
+    background:var(--paper); color:var(--ink);
+    max-width:420px; width:100%;
+    padding:32px 26px 26px; border-radius:6px;
+    text-align:center;
+  }
+  .thanks-box img{width:64px; height:64px; display:block; margin:0 auto 14px;}
+  .thanks-box h2{font-size:1.4rem; margin:0 0 12px;}
+  .thanks-box p{font-size:.92rem; line-height:1.9; margin:0 0 20px;}
+  .thanks-box button{
+    font:inherit; cursor:pointer;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:999px; padding:10px 28px;
+  }
   #overlay{
     position:fixed; inset:0; background:rgba(0,0,0,.45);
     opacity:0; pointer-events:none; transition:opacity .25s;
@@ -438,7 +458,7 @@
     width:24px;height:24px; border:1px solid rgba(0,0,0,.15); background:none;
     border-radius:50%; cursor:pointer; font-size:.85rem; line-height:1;
   }
-  .qty-row .remove{border:none; color:var(--clay); font-size:.76rem; text-decoration:underline; cursor:pointer; margin-left:auto;}
+  .qty-row .remove{border:none; background:none; color:var(--clay); font-size:.76rem; text-decoration:underline; cursor:pointer; margin-left:auto; white-space:nowrap; flex-shrink:0; width:auto; height:auto; border-radius:0;}
   .ci-price{font-size:.85rem; white-space:nowrap;}
   #cart-empty{padding:60px 10px; text-align:center; color:#8a8368; font-size:.9rem;}
   .drawer-foot{
@@ -456,11 +476,11 @@
     border-top:1px solid rgba(0,0,0,.1);
   }
   .checkout-btn{
-    width:100%; background:var(--clay); color:var(--text-light);
+    width:100%; background:var(--ink); color:var(--text-light);
     border:none; padding:14px; border-radius:2px; font-size:.95rem;
     cursor:pointer; transition:background .2s;
   }
-  .checkout-btn:hover{background:var(--gold);}
+  .checkout-btn:hover{opacity:.88;}
   .checkout-btn:disabled{opacity:.55; cursor:not-allowed;}
   .pay-method-select{
     display:flex; gap:8px;
@@ -504,6 +524,9 @@
 
   /* ---------- customer form (お届け先) ---------- */
   #customer-form{display:none; margin-bottom:16px;}
+  .bank-steps{margin:0 0 14px; padding-left:1.3em; font-size:.82rem; line-height:1.8;}
+  .bank-steps li{margin-bottom:6px;}
+  .bank-account{font-size:.9rem; line-height:1.8; margin:0;}
   #customer-form.open{display:block;}
   .cf-title{font-weight:700; font-size:.92rem; margin:0 0 4px;}
   .cf-lead{font-size:.74rem; color:var(--muted-dark); margin:0 0 12px;}
@@ -600,6 +623,14 @@
   </div>
 </footer>
 
+<div class="thanks" id="thanks" role="dialog" aria-modal="true" aria-labelledby="thanks-title" hidden>
+  <div class="thanks-box">
+    <img src="images/logo.png" alt="">
+    <h2 id="thanks-title"><span class="nb">ご注文</span><span class="nb">ありがとうございました</span></h2>
+    <p><span class="nb">発送の準備ができ次第、</span><span class="nb">メールでご連絡いたします。</span><br><span class="nb">お茶の到着まで、</span><span class="nb">今しばらくお待ちください。</span></p>
+    <button type="button" id="thanks-close">閉じる</button>
+  </div>
+</div>
 <div id="overlay"></div>
 <div id="drawer" aria-label="ショッピングカート">
   <div class="drawer-head">
@@ -628,62 +659,66 @@
       <button type="button" class="pay-method-btn" data-method="bank">銀行振込で注文する</button>
     </div>
 
-    <div id="card-pay-section">
-      <div id="customer-form">
-        <p class="cf-title">お届け先</p>
-        <p class="cf-lead"><span class="nb">郵便番号を入れると</span><span class="nb">住所が自動で入ります。</span><span class="nb">ここで入力した</span><span class="nb">お届け先で</span><span class="nb">発送するので、</span><span class="nb">次のお支払い画面では</span><span class="nb">住所の入力は</span><span class="nb">不要です。</span></p>
-        <div class="cf-grid">
-          <div class="cf-field">
-            <label for="cf-lastName">姓</label>
-            <input id="cf-lastName" autocomplete="family-name">
-          </div>
-          <div class="cf-field">
-            <label for="cf-firstName">名</label>
-            <input id="cf-firstName" autocomplete="given-name">
-          </div>
-          <div class="cf-field full">
-            <label for="cf-email">メールアドレス(注文確認・発送のご連絡に使います)</label>
-            <input id="cf-email" type="email" inputmode="email" autocomplete="email">
-          </div>
-          <div class="cf-field full">
-            <label for="cf-phone">電話番号(例: 090-1234-5678)</label>
-            <input id="cf-phone" type="tel" inputmode="tel" autocomplete="tel">
-          </div>
-          <div class="cf-field">
-            <label for="cf-postal">郵便番号</label>
-            <input id="cf-postal" inputmode="numeric" autocomplete="postal-code" placeholder="123-4567">
-          </div>
-          <div class="cf-field">
-            <label for="cf-pref">都道府県</label>
-            <select id="cf-pref" autocomplete="address-level1"></select>
-          </div>
-          <div class="cf-field full">
-            <label for="cf-city">市区町村</label>
-            <input id="cf-city" autocomplete="address-level2">
-          </div>
-          <div class="cf-field full">
-            <label for="cf-address1">町名・番地(番地まで入力してください)</label>
-            <input id="cf-address1" autocomplete="address-line1">
-          </div>
-          <div class="cf-field full">
-            <label for="cf-address2">建物名・部屋番号 <span class="opt">(任意)</span></label>
-            <input id="cf-address2" autocomplete="address-line2">
-          </div>
+    <div id="customer-form">
+      <p class="cf-title">お届け先</p>
+      <p class="cf-lead"><span class="nb">郵便番号を入れると</span><span class="nb">住所が自動で入ります。</span></p>
+      <div class="cf-grid">
+        <div class="cf-field">
+          <label for="cf-lastName">姓</label>
+          <input id="cf-lastName" autocomplete="family-name">
+        </div>
+        <div class="cf-field">
+          <label for="cf-firstName">名</label>
+          <input id="cf-firstName" autocomplete="given-name">
+        </div>
+        <div class="cf-field full">
+          <label for="cf-email">メールアドレス(注文確認・発送のご連絡に使います)</label>
+          <input id="cf-email" type="email" inputmode="email" autocomplete="email">
+        </div>
+        <div class="cf-field full">
+          <label for="cf-phone">電話番号(例: 090-1234-5678)</label>
+          <input id="cf-phone" type="tel" inputmode="tel" autocomplete="tel">
+        </div>
+        <div class="cf-field">
+          <label for="cf-postal">郵便番号</label>
+          <input id="cf-postal" inputmode="numeric" autocomplete="postal-code" placeholder="123-4567">
+        </div>
+        <div class="cf-field">
+          <label for="cf-pref">都道府県</label>
+          <select id="cf-pref" autocomplete="address-level1"></select>
+        </div>
+        <div class="cf-field full">
+          <label for="cf-city">市区町村</label>
+          <input id="cf-city" autocomplete="address-level2">
+        </div>
+        <div class="cf-field full">
+          <label for="cf-address1">町名・番地(番地まで入力してください)</label>
+          <input id="cf-address1" autocomplete="address-line1">
+        </div>
+        <div class="cf-field full">
+          <label for="cf-address2">建物名・部屋番号 <span class="opt">(任意)</span></label>
+          <input id="cf-address2" autocomplete="address-line2">
         </div>
       </div>
+    </div>
+    <div id="card-pay-section">
       <button class="checkout-btn" id="checkout-btn">レジに進む</button>
-      <p class="ship-note">カード・Apple Pay・Google Pay等がご利用いただけます(送料込みの金額で決済されます)</p>
+      <p class="ship-note">カード・Apple Pay・Google Pay等がご利用いただけます。送料込みの金額で決済され、お支払い画面での住所入力は不要です。</p>
     </div>
 
     <div id="bank-pay-section" style="display:none;">
       <div class="bank-box">
-        <p class="bank-box-title">お振込先</p>
-        <p>GMOあおぞらネット銀行 ビジネス第二支店(202)<br>普通 1107638<br>口座名義: ドウーイツトフアーム フクヤ ケンジ</p>
+        <p class="bank-box-title">銀行振込でのご注文の流れ</p>
+        <ol class="bank-steps">
+          <li><span class="nb">上のお届け先を入力し、</span><span class="nb">「注文メールを送る」を押します。</span><span class="nb">メールアプリが開くので、</span><span class="nb">そのまま送信してください。</span></li>
+          <li><span class="nb">下記の口座へ</span><span class="nb">送料込みの合計金額を</span><span class="nb">お振込みください。</span><span class="nb">振込名義の前に</span><span class="nb">注文番号を入れていただけると</span><span class="nb">確認がスムーズです。</span></li>
+          <li><span class="nb">ご入金を確認後、</span><span class="nb">発送してご連絡します。</span></li>
+        </ol>
         <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
-        <p class="bank-note">送料込みの合計金額をお振込みください。お振込の際、可能であれば注文番号をお名前の前などにご記入ください。ご入金確認後、発送のご連絡をいたします。</p>
+        <p class="bank-account"><span class="nb">GMOあおぞらネット銀行</span> <span class="nb">ビジネス第二支店(202)</span><br>普通 1107638<br>口座名義: <span class="nb">ドウーイツトフアーム</span> <span class="nb">フクヤ ケンジ</span></p>
       </div>
-      <button class="checkout-btn" id="bank-confirm-btn">この内容をメールで送る</button>
-      <p class="ship-note">メール送信後、当店で内容を確認しご連絡いたします</p>
+      <button class="checkout-btn" id="bank-confirm-btn">注文メールを送る</button>
+      <p class="ship-note"><span class="nb">メールアプリが開かない場合は、</span><span class="nb">注文番号・ご注文内容・お届け先を</span><span class="nb">info@doitfarm.com まで</span><span class="nb">お送りください。</span></p>
     </div>
 
     <p class="ship-note">沖縄県・離島へのお届けは、確認のうえ追加送料についてご連絡する場合があります</p>
@@ -784,7 +819,7 @@ function renderProducts(){
                   <dt>原材料名</dt><dd>${p.labelIngredients}</dd>
                   <dt>栽培方法</dt><dd>自然栽培(農薬・肥料[化学肥料・有機肥料とも]を栽培期間中使用せず)</dd>
                   <dt>内容量</dt><dd>${p.weight}</dd>
-                  <dt>賞味期限</dt><dd>枠外下部に記載</dd>
+                  <dt>賞味期限</dt><dd>商品パッケージに記載</dd>
                   <dt>保存方法</dt><dd>直射日光・高温多湿を避け、常温で保存してください</dd>
                   <dt>販売者</dt><dd>DOIT!FARM! 福屋健治<br>京都府木津川市加茂町山田西山田20</dd>
                 </dl>
@@ -1052,6 +1087,11 @@ document.querySelectorAll('.pay-method-btn').forEach(btn=>{
     if(method === 'bank'){
       cardSection.style.display = 'none';
       bankSection.style.display = 'block';
+      if(!customerForm.classList.contains('open')){
+        customerForm.classList.add('open');
+        checkoutBtn.textContent = 'お支払いへ進む';
+        onPostalInput();
+      }
       if(!currentOrderNumber){
         currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
         document.getElementById('bank-order-number').textContent = currentOrderNumber;
@@ -1070,6 +1110,19 @@ document.querySelectorAll('.pay-method-btn').forEach(btn=>{
 document.getElementById('bank-confirm-btn').addEventListener('click', () => {
   const ids = Object.keys(cart).filter(id => cart[id] > 0 && PRODUCTS.find(x=>x.id===id));
   if(ids.length === 0) return;
+  const errBox = document.getElementById('checkout-error');
+  errBox.style.display = 'none';
+  const customer = readCustomer();
+  const problem = validateCustomer(customer);
+  if(problem){
+    errBox.textContent = problem;
+    errBox.style.display = 'block';
+    errBox.scrollIntoView({ behavior:'smooth', block:'center' });
+    const firstBad = customerForm.querySelector('.invalid');
+    if(firstBad) firstBad.focus();
+    return;
+  }
+  saveCustomer(customer);
   if(!currentOrderNumber){
     currentOrderNumber = 'DF' + Date.now().toString().slice(-8);
     document.getElementById('bank-order-number').textContent = currentOrderNumber;
@@ -1101,8 +1154,9 @@ document.getElementById('bank-confirm-btn').addEventListener('click', () => {
     `お名前: ${name}`,
     `ご住所: ${address}`,
     `電話番号: ${c.phone || ''}`,
+    `メールアドレス: ${c.email || ''}`,
     '',
-    '(空欄があればご記入のうえ、このまま送信してください)',
+    '(このまま送信してください)',
     '(沖縄県・離島の場合、確認のうえ追加送料についてご連絡することがあります)',
   ];
   const subject = encodeURIComponent(`銀行振込でのご注文(注文番号: ${currentOrderNumber})`);
@@ -1117,7 +1171,11 @@ if (new URLSearchParams(location.search).get('checkout') === 'success') {
   cart = {};
   try { localStorage.setItem('uji-cart', '{}'); } catch(e) {}
   history.replaceState(null, '', location.pathname);
-  setTimeout(() => alert('ご注文ありがとうございました。\n発送準備ができ次第ご連絡いたします。'), 300);
+  const thanks = document.getElementById('thanks');
+  thanks.hidden = false;
+  const closeThanks = () => { thanks.hidden = true; };
+  document.getElementById('thanks-close').addEventListener('click', closeThanks);
+  thanks.addEventListener('click', (e) => { if (e.target === thanks) closeThanks(); });
 }
 
 initCustomerForm();
