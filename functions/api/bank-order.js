@@ -42,6 +42,23 @@ async function prefMatchesPostal(postal, pref) {
   }
 }
 
+// いたずら注文対策: Turnstile のトークンを確認(TURNSTILE_SECRET_KEY が設定されているときだけ)
+async function verifyTurnstile(token, ip, secret) {
+  if (!secret) return true;
+  if (!token) return false;
+  try {
+    const form = new FormData();
+    form.append('secret', secret);
+    form.append('response', token);
+    if (ip) form.append('remoteip', ip);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
+    const data = await res.json();
+    return data.success === true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.RESEND_API_KEY || !env.SQUARE_ACCESS_TOKEN) {
     return json({ error: 'メール送信の設定が完了していません' }, 500);
@@ -61,6 +78,8 @@ export async function onRequestPost({ request, env }) {
   if (!orderNumber) return json({ error: '注文番号がありません' }, 400);
   if (!(await prefMatchesPostal(c.postal, c.pref))) return json({ error: '郵便番号と都道府県が一致しません。ご確認ください。' }, 400);
   if (items.length === 0) return json({ error: 'カートが空です' }, 400);
+  const human = await verifyTurnstile(String(body.turnstileToken || ''), request.headers.get('CF-Connecting-IP'), env.TURNSTILE_SECRET_KEY);
+  if (!human) return json({ error: '確認に失敗しました。ページを再読み込みして、もう一度お試しください' }, 400);
   for (const it of items) {
     const q = Number(it.quantity);
     if (!it.variationId || !Number.isInteger(q) || q < 1 || q > 99) return json({ error: '数量が正しくありません' }, 400);
