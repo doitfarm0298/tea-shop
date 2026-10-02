@@ -535,6 +535,7 @@
 
   /* ---------- customer form (お届け先) ---------- */
   #customer-form{display:none; margin-bottom:16px;}
+  .turnstile-box{display:flex; justify-content:center; margin:0 0 12px; min-height:0;}
   .bank-steps{margin:0 0 14px; padding-left:1.3em; font-size:.82rem; line-height:1.8;}
   .bank-steps li{margin-bottom:6px;}
   .bank-account{font-size:.9rem; line-height:1.8; margin:0;}
@@ -733,6 +734,8 @@
         <p class="bank-order-no">注文番号: <strong id="bank-order-number">-</strong></p>
         <p class="bank-account"><span class="nb">GMOあおぞらネット銀行</span> <span class="nb">ビジネス第二支店(202)</span><br>普通 1107638<br>口座名義: <span class="nb">ドウーイツトフアーム</span> <span class="nb">フクヤ ケンジ</span></p>
       </div>
+      <div id="turnstile-box" class="turnstile-box"></div>
+      <p id="ts-hint" class="addr-hint" style="text-align:center; margin:0 0 10px;" hidden>安全のための確認中です。数秒待ってから、もう一度「注文を確定する」を押してください。</p>
       <button class="checkout-btn" id="bank-confirm-btn">注文を確定する</button>
       <p class="ship-note"><span class="nb">確認メールが届かない場合は、</span><span class="nb">迷惑メールフォルダをご確認のうえ、</span><span class="nb">info@doitfarm.com まで</span><span class="nb">ご連絡ください。</span></p>
     </div>
@@ -1167,6 +1170,7 @@ document.querySelectorAll('.pay-method-btn').forEach(btn=>{
     if(method === 'bank'){
       cardSection.style.display = 'none';
       bankSection.style.display = 'block';
+      renderTurnstile();
       if(!customerForm.classList.contains('open')){
         customerForm.classList.add('open');
         checkoutBtn.textContent = 'お支払いへ進む';
@@ -1188,6 +1192,20 @@ document.querySelectorAll('.pay-method-btn').forEach(btn=>{
 // 銀行振込 → 注文内容をメールで送る(mailtoリンクを開く)
 // 以前に入力したお届け先があれば、自動で書き込みます。
 // ---------------------------------------------------------------
+// いたずら注文対策(Cloudflare Turnstile)。銀行振込を選んだときに表示します
+const TURNSTILE_SITE_KEY = '0x4AAAAAAFLovIo26BDrEhSs';
+let turnstileWidgetId = null;
+function renderTurnstile(){
+  if(!window.turnstile || turnstileWidgetId !== null) return;
+  turnstileWidgetId = window.turnstile.render('#turnstile-box', {
+    sitekey: TURNSTILE_SITE_KEY,
+    language: 'ja',
+    appearance: 'interaction-only'
+  });
+}
+window.onTurnstileLoad = () => {
+  if(document.getElementById('bank-pay-section').style.display !== 'none') renderTurnstile();
+};
 const bankBtn = document.getElementById('bank-confirm-btn');
 bankBtn.addEventListener('click', async () => {
   const ids = Object.keys(cart).filter(id => cart[id] > 0 && PRODUCTS.find(x=>x.id===id));
@@ -1216,13 +1234,22 @@ bankBtn.addEventListener('click', async () => {
     return { variationId: p.squareVariationId, name: p.name, weight: p.weight, quantity: cart[id] };
   });
 
+  const tsToken = (window.turnstile && turnstileWidgetId !== null) ? window.turnstile.getResponse(turnstileWidgetId) : '';
+  if(!tsToken){
+    renderTurnstile();
+    const hint = document.getElementById('ts-hint');
+    hint.hidden = false;
+    hint.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  document.getElementById('ts-hint').hidden = true;
   bankBtn.disabled = true;
   bankBtn.textContent = '送信中…';
   try{
     const res = await fetch('/api/bank-order', {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ items, customer, orderNumber: currentOrderNumber })
+      body: JSON.stringify({ items, customer, orderNumber: currentOrderNumber, turnstileToken: tsToken })
     });
     let data = {};
     try { data = await res.json(); } catch(e) {}
@@ -1254,6 +1281,7 @@ bankBtn.addEventListener('click', async () => {
   } finally {
     bankBtn.disabled = false;
     bankBtn.textContent = '注文を確定する';
+    if(window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId);
   }
 });
 
@@ -1282,5 +1310,6 @@ renderProducts();
 renderCartBadge();
 renderCartDrawer();
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" async defer></script>
 </body>
 </html>
